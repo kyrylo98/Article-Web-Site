@@ -17,7 +17,18 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from rest_framework import routers
+from articles.views import ArticleViewSet
+from comments.views import CommentViewSet
+from likes.views import LikeViewSet
 
+
+router = routers.DefaultRouter()
+router.register(r'articles', ArticleViewSet)
+router.register(r'comments', CommentViewSet)
+router.register(r'likes', LikeViewSet)
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('api/', include(router.urls)),
+
 ]
