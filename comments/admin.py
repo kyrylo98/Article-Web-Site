@@ -5,5 +5,5 @@ from .models import Comment
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "author", "article", "created_at")
     list_filter = ("created_at", "author")
-    search_fields = ("text",)
+    search_fields = ("content",)
     ordering = ("-created_at",)

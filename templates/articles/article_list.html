@@ -11,7 +11,7 @@
             <h2 class="card-title">{{ article.title }}</h2>
             <p class="card-text">{{ article.content|truncatewords:20 }}</p>
             <p><small class="text-muted">Автор: {{ article.author.username }} | {{ article.created_at }}</small></p>
-            <a href="{% url 'articles:article_detail' article.id %}" class="btn btn-primary">Читать далее</a>
+            <a href="{% url 'articles:detail' article.slug %}" class="btn btn-primary">Читать далее</a>
         </div>
     </div>
 {% empty %}

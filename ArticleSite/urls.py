@@ -18,9 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from articles.views import ArticleViewSet
+from articles.api import ArticleViewSet
 from comments.views import CommentViewSet
 from likes.views import LikeViewSet
+from users.views import users_list
 
 
 router = routers.DefaultRouter()
@@ -32,6 +33,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('articles.urls')),
     path('api/', include(router.urls)),
+    path('users/', users_list, name='users_list'),
 
     path("admin/", admin.site.urls),
     path("articles/", include("articles.urls")),
