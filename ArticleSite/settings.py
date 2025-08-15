@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     "articles",
     "comments",
     "users",
+    "likes",
     "rest_framework",
+    "bootstrap5",
 ]
 
 MIDDLEWARE = [

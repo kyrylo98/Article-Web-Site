@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ article.title }}</h1>
+<p>{{ article.content }}</p>
+<p><small class="text-muted">Автор: {{ article.author.username }} | {{ article.created_at }}</small></p>
+
+<hr>
+<h3>Комментарии</h3>
+{% for comment in article.comments.all %}
+    <div class="mb-2 p-2 border rounded">
+        <strong>{{ comment.author.username }}</strong>: {{ comment.content }}
+    </div>
+{% empty %}
+    <p>Нет комментариев</p>
+{% endfor %}
+{% endblock %}

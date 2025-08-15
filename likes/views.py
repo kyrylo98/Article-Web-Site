@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from .models import Article
+from .models import Like
 from .serializers import LikeSerializer
 
-class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
     serializer_class = LikeSerializer
