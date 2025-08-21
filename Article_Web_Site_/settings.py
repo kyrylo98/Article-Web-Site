@@ -75,20 +75,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "UTC"
+
 USE_I18N = True
+
 USE_TZ = True
 
 STATIC_URL = "/static/"
+
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
+
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 AUTH_USER_MODEL = "users.User"
 
 LOGIN_URL = "login"
+
 LOGIN_REDIRECT_URL = "users:account"
+
 LOGOUT_REDIRECT_URL = "articles:index"

@@ -1,47 +1,133 @@
 {% extends "base.html" %}
-{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %}
- — Aurora{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %}
+article{% endblock %}
+
 {% block content %}
 <section class="section">
-  <div class="container form-narrow">
-    <h2 class="page-title">
-      {% if form.instance.pk %}Edit article{% else %}Create article{% endif %}
-    </h2>
+  <div class="container">
 
-    <form method="post" enctype="multipart/form-data" class="form">
-      {% csrf_token %}
-      <div class="field">
-        <label>Title</label>
-        {{ form.title }}
-      </div>
+    <div class="hero-gradient">
+      <h1 class="page-title">
+        {% if form.instance.pk %}Edit{% else %}Create{% endif %} article
+      </h1>
+      <p class="page-sub">
+        Write modern, clean articles. Keep it short and readable.
+      </p>
+    </div>
 
-      <div class="field">
-        <label>Description</label>
-        {{ form.description }}
-      </div>
+    <div class="card form-card">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
 
-      <div class="field">
-        <label>Image</label>
-        {{ form.image }}
-      </div>
+        {% if form.non_field_errors %}
+          <div class="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
 
-      <div class="field">
-        <label>Body</label>
-        {{ form.body }}
-        <small class="muted">~ {{ form.instance.reading_minutes|default:1 }}
-          min read</small>
-      </div>
+        <div class="field">
+          {{ form.title.label_tag }}
+          {{ form.title }}
+          {% if form.title.errors %}
+            <div class="error">{{ form.title.errors|striptags }}</div>
+          {% endif %}
+        </div>
 
-      <div class="field inline">
-        <label>Published?</label>
-        {{ form.is_published }}
-      </div>
+        <div class="field">
+          <div class="label-row">
+            {{ form.description.label_tag }}
+            <span class="muted" id="desc-count">0/160</span>
+          </div>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <div class="error">
+              {{ form.description.errors|striptags }}
+            </div>
+          {% endif %}
+          <p class="hint">
+            Оставьте короткое и ясное описание — для списка и SEO.
+          </p>
+        </div>
 
-      <div class="actions">
-        <button class="btn" type="submit">Save</button>
-        <a class="btn ghost" href="{% url 'articles:index' %}">Cancel</a>
-      </div>
-    </form>
+        <div class="field">
+          {{ form.image.label_tag }}
+          <div class="file">
+            {{ form.image }}
+            <span class="file-name" id="file-name">No file chosen</span>
+          </div>
+          {% if form.image.errors %}
+            <div class="error">{{ form.image.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            {{ form.body.label_tag }}
+            <span class="muted" id="read-meter">~ 1 min read</span>
+          </div>
+          {{ form.body }}
+          {% if form.body.errors %}
+            <div class="error">{{ form.body.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field inline">
+          <label class="checkbox">
+            {{ form.is_published }} <span>Published?</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="cta" type="submit">Save</button>
+          <a class="cta secondary" href="{% url 'articles:index' %}">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+
   </div>
 </section>
+
+<script>
+(function () {
+  const desc = document.getElementById(
+    "{{ form.description.id_for_label }}"
+  );
+  const descCount = document.getElementById("desc-count");
+  const body = document.getElementById(
+    "{{ form.body.id_for_label }}"
+  );
+  const readMeter = document.getElementById("read-meter");
+  const fileInput = document.getElementById(
+    "{{ form.image.id_for_label }}"
+  );
+  const fileName = document.getElementById("file-name");
+
+  function updateDesc() {
+    if (!desc || !descCount) return;
+    const len = desc.value ? desc.value.length : 0;
+    descCount.textContent = len + "/160";
+  }
+
+  function minutesFromText(text) {
+    const words = (text || "").trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }
+
+  function updateRead() {
+    if (!body || !readMeter) return;
+    readMeter.textContent = "~ " + minutesFromText(body.value) + " min read";
+  }
+
+  function updateFile() {
+    if (!fileInput || !fileName) return;
+    fileName.textContent = fileInput.files.length
+      ? fileInput.files[0].name
+      : "No file chosen";
+  }
+
+  if (desc) { updateDesc(); desc.addEventListener("input", updateDesc); }
+  if (body) { updateRead(); body.addEventListener("input", updateRead); }
+  if (fileInput) fileInput.addEventListener("change", updateFile);
+})();
+</script>
 {% endblock %}
