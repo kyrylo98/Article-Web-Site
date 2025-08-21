@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %}
+ — Aurora{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-narrow">
+    <h2 class="page-title">
+      {% if form.instance.pk %}Edit article{% else %}Create article{% endif %}
+    </h2>
+
+    <form method="post" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      <div class="field">
+        <label>Title</label>
+        {{ form.title }}
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        {{ form.description }}
+      </div>
+
+      <div class="field">
+        <label>Image</label>
+        {{ form.image }}
+      </div>
+
+      <div class="field">
+        <label>Body</label>
+        {{ form.body }}
+        <small class="muted">~ {{ form.instance.reading_minutes|default:1 }}
+          min read</small>
+      </div>
+
+      <div class="field inline">
+        <label>Published?</label>
+        {{ form.is_published }}
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit">Save</button>
+        <a class="btn ghost" href="{% url 'articles:index' %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

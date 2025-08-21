@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — Aurora{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-narrow">
+    <h2 class="page-title">Edit profile</h2>
+    <form method="post" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      <div class="field">
+        <label>Avatar</label>
+        {{ form.avatar }}
+      </div>
+      <div class="field">
+        <label>First name</label>
+        {{ form.first_name }}
+      </div>
+      <div class="field">
+        <label>Last name</label>
+        {{ form.last_name }}
+      </div>
+      <div class="field">
+        <label>Email</label>
+        {{ form.email }}
+      </div>
+      <div class="field">
+        <label>Bio</label>
+        {{ form.bio }}
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit">Save</button>
+        <a class="btn ghost" href="{% url 'users:account' %}">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,8 +1,18 @@
 {% extends "base.html" %}
-
+{% block title %}Welcome — Aurora{% endblock %}
 {% block content %}
-    <h1>Home</h1>
-    <p>Welcome!</p>
-    <h2>Dynamic content</h2>
-    <p>Text:</p>
+<section class="section">
+  <div class="container hero">
+    <h1>Write. Read. Be concise.</h1>
+    <p class="muted">
+      Modern blog engine with images, search and clean typography.
+    </p>
+    <div class="actions">
+      <a class="btn" href="{% url 'login' %}">Login</a>
+      <a class="btn ghost" href="{% url 'articles:index' %}">
+        Browse articles
+      </a>
+    </div>
+  </div>
+</section>
 {% endblock %}

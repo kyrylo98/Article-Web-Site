@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Account — Aurora{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h2 class="page-title">Personal account</h2>
+    <div class="card-grid two">
+      <div class="card">
+        <div class="flex">
+          {% if request.user.avatar %}
+            <img class="avatar-lg" src="{{ request.user.avatar.url }}"
+                 alt="{{ request.user.username }}">
+          {% else %}
+            <div class="avatar-fallback avatar-lg">
+              {{ request.user.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+          <div>
+            <h3 class="m0">
+              {{ request.user.get_full_name|default:request.user.username }}
+            </h3>
+            <p class="muted m0">
+              Rating: {{ request.user.rating }}
+              {% if request.user.is_verified %}
+                <span class="badge-verified">Verified</span>
+              {% endif %}
+            </p>
+          </div>
+        </div>
+        <p class="muted">{{ request.user.bio|default:"No bio yet." }}</p>
+        <a class="cta" href="{% url 'users:profile' %}">Edit profile</a>
+      </div>
+
+      <div class="card">
+        <h3>Security</h3>
+        <p>Change your account password.</p>
+        <a class="cta" href="{% url 'users:password_change' %}">
+          Change password
+        </a>
+      </div>
+    </div>
+
+    <div class="mt">
+      <a class="btn" href="{% url 'articles:create' %}">Write article</a>
+      <a class="btn ghost" href="{% url 'articles:index' %}">
+        Browse articles
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
