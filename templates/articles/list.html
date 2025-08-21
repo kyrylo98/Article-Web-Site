@@ -1,50 +1,47 @@
 {% extends "base.html" %}
-{% block title %}Articles — Aurora{% endblock %}
+
 {% block content %}
-<section class="section">
-  <div class="container">
-    <h2 class="page-title">Articles</h2>
+<section class="section container">
+  <h1 class="page-title">Articles</h1>
 
-    <form method="get" class="search">
-      <input name="q" value="{{ request.GET.q|default:'' }}"
-             placeholder="Search articles...">
-      <button class="btn" type="submit">Search</button>
-    </form>
-
-    <div class="card-grid">
-      {% for item in articles %}
-        <a class="card" href="{{ item.get_absolute_url }}">
-          <span class="badge">
-            {{ item.published_at|date:"Y-m-d" }}
-            • {{ item.reading_minutes }} min
-          </span>
-          <h3>{{ item.title }}</h3>
-          <p class="muted">{{ item.description }}</p>
+  <div class="card-grid">
+    {% for item in page_obj %}
+      <article class="card">
+        <a href="{% url 'articles:detail' item.pk %}">
+          <h3 class="m0">{{ item.title }}</h3>
         </a>
-      {% empty %}
-        <p>No articles yet.</p>
-      {% endfor %}
-    </div>
+        <p class="muted m0">{{ item.description }}</p>
+        <p class="badge m0">
+          {{ item.published_at|date:"M j, Y" }}
+          • {{ item.reading_minutes }} min read
+        </p>
 
-    {% if is_paginated %}
-      <div class="pagination">
-        {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}
-                   {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
-            « Prev
-          </a>
+        {% if request.user.is_authenticated %}
+          {% if request.user.is_staff or request.user.pk == item.author_id %}
+            <div class="actions mt">
+              <a class="cta" href="{% url 'articles:edit' item.pk %}">Edit</a>
+              <a class="cta secondary"
+                 href="{% url 'articles:delete' item.pk %}">Delete</a>
+            </div>
+          {% endif %}
         {% endif %}
-        <span>
-          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-        </span>
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}
-                   {% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
-            Next »
-          </a>
-        {% endif %}
-      </div>
-    {% endif %}
+      </article>
+    {% empty %}
+      <p>No articles yet.</p>
+    {% endfor %}
   </div>
+
+  {% include "includes/pagination.html" %}
 </section>
 {% endblock %}
+<section class="section container hero-gradient" aria-labelledby="seo-h1">
+  <h1 id="seo-h1" class="page-title">
+    Build faster with clear, practical articles
+  </h1>
+  <p class="page-sub">
+    Short, hands-on guides on programming, web development, and
+    product design. Real-world examples, checklists, and how-tos
+    to level up your projects.
+  </p>
+</section>
+

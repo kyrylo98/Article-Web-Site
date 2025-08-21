@@ -1,18 +1,144 @@
 {% extends "base.html" %}
-{% block title %}Welcome — Aurora{% endblock %}
+{% load static %}
+
+{% block title %}Aurora — Practical guides for developers & makers{% endblock %}
+
+{% block meta %}
+  {{ block.super }}
+  <meta name="description"
+        content="Aurora is a clean, fast reading experience with concise
+                 articles on programming, web development, UI/UX and product
+                 thinking. Actionable checklists, patterns and how-tos.">
+  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/">
+  <meta property="og:title"
+        content="Aurora — Practical guides for developers & makers">
+  <meta property="og:description"
+        content="Short, trustworthy articles you can apply in minutes.">
+  <meta property="og:image" content="{% static 'img/hero.jpg' %}">
+  <meta name="twitter:title"
+        content="Aurora — Practical guides for developers & makers">
+  <meta name="twitter:description"
+        content="Short, trustworthy articles you can apply in minutes.">
+
+  <!-- WebSite + SearchAction + FAQPage JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Aurora",
+    "url":"{{ request.scheme }}://{{ request.get_host }}/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"{{ request.scheme }}://{{ request.get_host }}/articles/?q={query}",
+      "query-input":"required name=query"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {
+        "@type":"Question",
+        "name":"What topics does Aurora cover?",
+        "acceptedAnswer":{
+          "@type":"Answer",
+          "text":"Programming, web development (Django, Python, APIs),
+                  frontend UI/UX, product design and productivity
+                  checklists for makers."
+        }
+      },
+      {
+        "@type":"Question",
+        "name":"Are the articles beginner-friendly?",
+        "acceptedAnswer":{
+          "@type":"Answer",
+          "text":"Yes. Each post is short, actionable and includes steps,
+                  code snippets and links to deeper resources."
+        }
+      },
+      {
+        "@type":"Question",
+        "name":"Can I publish on Aurora?",
+        "acceptedAnswer":{
+          "@type":"Answer",
+          "text":"Create an account, open the Write page and submit your
+                  draft. Keep it concise and practical."
+        }
+      }
+    ]
+  }
+  </script>
+{% endblock %}
+
 {% block content %}
-<section class="section">
-  <div class="container hero">
-    <h1>Write. Read. Be concise.</h1>
-    <p class="muted">
-      Modern blog engine with images, search and clean typography.
-    </p>
-    <div class="actions">
-      <a class="btn" href="{% url 'login' %}">Login</a>
-      <a class="btn ghost" href="{% url 'articles:index' %}">
-        Browse articles
-      </a>
+<section class="section container">
+
+  <!-- Hero -->
+  <div class="card--glass hero-gradient"
+       style="position:relative;overflow:hidden;
+              background-image:url('{% static "img/hero.jpg" %}');
+              background-size:cover;background-position:center;
+              min-height:260px;border-radius:18px;">
+    <div style="position:absolute;inset:0;
+                background:linear-gradient(90deg,
+                rgba(11,16,32,.90), rgba(11,16,32,.55));"></div>
+
+    <div style="position:relative;max-width:720px;padding:28px 24px;">
+      <p class="kicker">Modern • Readable • Practical</p>
+      <h1 class="page-title m0">Learn faster with concise articles</h1>
+      <p class="muted" style="max-width:64ch">
+        Aurora is a content hub for developers and makers. We publish
+        compact, trustworthy guides on Python &amp; Django, APIs,
+        frontend craft, UI/UX and product thinking. No fluff — just
+        steps, patterns and checklists that save your time.
+      </p>
+
+      <div class="actions">
+        <a class="cta" href="{% url 'articles:create' %}">Write an article</a>
+        <a class="cta secondary" href="{% url 'articles:index' %}">
+          Browse articles
+        </a>
+      </div>
     </div>
   </div>
+
+  <!-- SEO body copy -->
+  <div class="card" style="padding:22px">
+    <h2 class="m0">What you’ll find on Aurora</h2>
+    <p>
+      • <strong>Programming &amp; backend:</strong> Python patterns,
+      Django tips, REST and GraphQL APIs, security, testing, deployment.<br>
+      • <strong>Frontend &amp; UI:</strong> HTML semantics,
+      accessible components, layout systems, performance budgets.<br>
+      • <strong>Product &amp; UX:</strong> research shortcuts, content
+      design, writing for clarity, onboarding checklists, release notes.
+    </p>
+
+    <h3 class="m0">Why it ranks and reads well</h3>
+    <ul>
+      <li>Clean semantic HTML with proper headings and internal links.</li>
+      <li>Unique meta descriptions, Open Graph/Twitter cards for sharing.</li>
+      <li>Structured data (JSON-LD) for Organization, WebSite & FAQ.</li>
+      <li>Fast dark UI, minimal CSS, compressed hero imagery.</li>
+      <li>Short paragraphs and scannable lists for higher engagement.</li>
+    </ul>
+
+    <h3 class="m0">Our publishing principles</h3>
+    <p>
+      Each post is edited for clarity and usefulness. We prefer examples
+      over theory, and checklists over walls of text. If a tutorial
+      takes more than 7–10 minutes to apply, we split it into parts.
+    </p>
+
+    <h3 class="m0">Keywords we naturally target</h3>
+    <p class="muted" style="max-width:70ch">
+      django best practices, python snippets, web performance checklist,
+      accessible components, product design tips, write better release
+      notes, README patterns, content design guidelines.
+    </p>
+  </div>
+
 </section>
 {% endblock %}
