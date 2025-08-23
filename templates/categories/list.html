@@ -2,28 +2,24 @@
 {% block content %}
 <section class="section container">
   <h1 class="page-title">Categories</h1>
-
-  <form class="search" method="get">
-    <input class="input" type="search" name="q"
-           value="{{ query }}" placeholder="Search categories…">
-    <button class="btn" type="submit">Search</button>
-  </form>
-
-  <div class="card-grid mt">
-    {% for cat in page_obj %}
-      <article class="card">
-        <h3 class="m0">
-          <a href="{% url 'categories:detail' cat.pk %}">{{ cat.name }}</a>
-        </h3>
-        {% if cat.description %}
-          <p class="muted m0">{{ cat.description }}</p>
-        {% endif %}
-      </article>
-    {% empty %}
-      <p>No categories yet.</p>
-    {% endfor %}
+  <div class="cats-grid" style="margin-top:14px">
+    {% for cat in categories %}
+      <a class="cat-tile" href="{% url 'articles:index' %}?category={{ cat.pk }}">
+        <span class="cat-name">{{ cat.name }}</span>
+        <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
+      </a>
+    {% empty %}<p>No categories yet.</p>{% endfor %}
   </div>
-
-  {% include "includes/pagination.html" %}
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a class="btn-link" href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+      {% endif %}
+      <span class="muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="btn-link" href="?page={{ page_obj.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
 </section>
 {% endblock %}

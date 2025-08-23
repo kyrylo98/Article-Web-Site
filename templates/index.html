@@ -1,70 +1,76 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static socialaccount %}
 
-{% block title %}Aurora — Practical guides for developers & makers{% endblock %}
+{% block title %}
+Aurora — Practical guides for developers & makers
+{% endblock %}
 
 {% block meta %}
   {{ block.super }}
   <meta name="description"
-        content="Aurora is a clean, fast reading experience with concise
-                 articles on programming, web development, UI/UX and product
-                 thinking. Actionable checklists, patterns and how-tos.">
-  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/">
+        content="Aurora publishes concise articles on programming,
+                 web development, UI/UX and product thinking.
+                 Actionable guides, patterns and checklists." />
+  <link rel="canonical"
+        href="{{ request.scheme }}://{{ request.get_host }}/" />
   <meta property="og:title"
-        content="Aurora — Practical guides for developers & makers">
+        content="Aurora — Practical guides for developers & makers" />
   <meta property="og:description"
-        content="Short, trustworthy articles you can apply in minutes.">
-  <meta property="og:image" content="{% static 'img/hero.jpg' %}">
+        content="Short, trustworthy articles you can apply in minutes." />
+  <meta property="og:image" content="{% static 'img/hero.jpg' %}" />
   <meta name="twitter:title"
-        content="Aurora — Practical guides for developers & makers">
+        content="Aurora — Practical guides for developers & makers" />
   <meta name="twitter:description"
-        content="Short, trustworthy articles you can apply in minutes.">
+        content="Short, trustworthy articles you can apply in minutes." />
 
-  <!-- WebSite + SearchAction + FAQPage JSON-LD -->
+  {# WebSite + SearchAction #}
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org",
-    "@type":"WebSite",
-    "name":"Aurora",
-    "url":"{{ request.scheme }}://{{ request.get_host }}/",
-    "potentialAction":{
-      "@type":"SearchAction",
-      "target":"{{ request.scheme }}://{{ request.get_host }}/articles/?q={query}",
-      "query-input":"required name=query"
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Aurora",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target":
+        "{{ request.scheme }}://{{ request.get_host }}/articles/?q={query}",
+      "query-input": "required name=query"
     }
   }
   </script>
+
+  {# FAQPage #}
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org",
-    "@type":"FAQPage",
-    "mainEntity":[
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
       {
-        "@type":"Question",
-        "name":"What topics does Aurora cover?",
-        "acceptedAnswer":{
-          "@type":"Answer",
-          "text":"Programming, web development (Django, Python, APIs),
-                  frontend UI/UX, product design and productivity
-                  checklists for makers."
+        "@type": "Question",
+        "name": "What topics does Aurora cover?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Programming, Django/Python backends, APIs,
+                   frontend UI/UX, product design and practical
+                   checklists for makers."
         }
       },
       {
-        "@type":"Question",
-        "name":"Are the articles beginner-friendly?",
-        "acceptedAnswer":{
-          "@type":"Answer",
-          "text":"Yes. Each post is short, actionable and includes steps,
-                  code snippets and links to deeper resources."
+        "@type": "Question",
+        "name": "Are articles beginner-friendly?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Posts are short, actionable and include steps,
+                   code snippets and links for deeper reading."
         }
       },
       {
-        "@type":"Question",
-        "name":"Can I publish on Aurora?",
-        "acceptedAnswer":{
-          "@type":"Answer",
-          "text":"Create an account, open the Write page and submit your
-                  draft. Keep it concise and practical."
+        "@type": "Question",
+        "name": "Can I publish on Aurora?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Create an account, open the Write page and submit a
+                   concise, useful draft."
         }
       }
     ]
@@ -75,68 +81,101 @@
 {% block content %}
 <section class="section container">
 
-  <!-- Hero -->
+  {# ---------- HERO ---------- #}
   <div class="card--glass hero-gradient"
        style="position:relative;overflow:hidden;
-              background-image:url('{% static "img/hero.jpg" %}');
+              background-image:url({% static 'img/hero.jpg' %});
               background-size:cover;background-position:center;
               min-height:260px;border-radius:18px;">
     <div style="position:absolute;inset:0;
                 background:linear-gradient(90deg,
-                rgba(11,16,32,.90), rgba(11,16,32,.55));"></div>
+                rgba(11,16,32,.92), rgba(11,16,32,.58));">
+    </div>
 
     <div style="position:relative;max-width:720px;padding:28px 24px;">
       <p class="kicker">Modern • Readable • Practical</p>
-      <h1 class="page-title m0">Learn faster with concise articles</h1>
+      <h1 class="page-title m0">
+        Learn faster with concise articles
+      </h1>
       <p class="muted" style="max-width:64ch">
         Aurora is a content hub for developers and makers. We publish
         compact, trustworthy guides on Python &amp; Django, APIs,
-        frontend craft, UI/UX and product thinking. No fluff — just
-        steps, patterns and checklists that save your time.
+        frontend craft, UI/UX and product thinking. No fluff — only
+        steps, patterns and checklists that save time.
       </p>
 
       <div class="actions">
-        <a class="cta" href="{% url 'articles:create' %}">Write an article</a>
+        {% if request.user.is_authenticated %}
+          <a class="cta" href="{% url 'articles:create' %}">
+            Write article
+          </a>
+        {% else %}
+          {# гостям ведём на регистрацию, но ниже дадим явные кнопки входа #}
+          <a class="cta" href="{% url 'account_signup' %}">
+            Write article
+          </a>
+        {% endif %}
         <a class="cta secondary" href="{% url 'articles:index' %}">
           Browse articles
         </a>
       </div>
+
+      {# три кнопки под "Write article" только для гостей #}
+      {% if not request.user.is_authenticated %}
+        <div class="auth-cta" style="margin-top:12px;display:flex;
+                                      gap:10px;flex-wrap:wrap">
+          <a class="btn ghost" href="{% url 'account_login' %}">
+            Login
+          </a>
+          <a class="btn ghost" href="{% url 'account_signup' %}">
+            Register
+          </a>
+          <a class="btn ghost" href="{% provider_login_url 'google' %}">
+            <span class="g-badge"
+                  style="display:inline-flex;align-items:center;
+                         justify-content:center;width:20px;height:20px;
+                         border-radius:50%;background:#fff;color:#4285f4;
+                         font-weight:700;margin-right:6px">G</span>
+            Sign in with Google
+          </a>
+        </div>
+      {% endif %}
     </div>
   </div>
 
-  <!-- SEO body copy -->
+  {# ---------- SEO body copy ---------- #}
   <div class="card" style="padding:22px">
     <h2 class="m0">What you’ll find on Aurora</h2>
     <p>
       • <strong>Programming &amp; backend:</strong> Python patterns,
-      Django tips, REST and GraphQL APIs, security, testing, deployment.<br>
-      • <strong>Frontend &amp; UI:</strong> HTML semantics,
-      accessible components, layout systems, performance budgets.<br>
+      Django tips, REST/GraphQL APIs, auth, testing, deployment.<br>
+      • <strong>Frontend &amp; UI:</strong> semantic HTML, accessible
+      components, layout systems, performance budgets.<br>
       • <strong>Product &amp; UX:</strong> research shortcuts, content
-      design, writing for clarity, onboarding checklists, release notes.
+      design, onboarding checklists, better release notes.
     </p>
 
     <h3 class="m0">Why it ranks and reads well</h3>
     <ul>
-      <li>Clean semantic HTML with proper headings and internal links.</li>
-      <li>Unique meta descriptions, Open Graph/Twitter cards for sharing.</li>
-      <li>Structured data (JSON-LD) for Organization, WebSite & FAQ.</li>
-      <li>Fast dark UI, minimal CSS, compressed hero imagery.</li>
-      <li>Short paragraphs and scannable lists for higher engagement.</li>
+      <li>Clean semantic HTML and internal linking.</li>
+      <li>Unique meta descriptions and social cards.</li>
+      <li>Structured data (WebSite, FAQ) via JSON-LD.</li>
+      <li>Fast dark UI with minimal CSS and compressed media.</li>
+      <li>Short paragraphs and scannable lists.</li>
     </ul>
 
-    <h3 class="m0">Our publishing principles</h3>
+    <h3 class="m0">Publishing principles</h3>
     <p>
-      Each post is edited for clarity and usefulness. We prefer examples
-      over theory, and checklists over walls of text. If a tutorial
-      takes more than 7–10 minutes to apply, we split it into parts.
+      Every post is edited for clarity and usefulness. We prefer examples
+      over theory and checklists over long prose. If a tutorial needs
+      more than 7–10 minutes, we split it into parts.
     </p>
 
-    <h3 class="m0">Keywords we naturally target</h3>
+    <h3 class="m0">Natural keyword themes</h3>
     <p class="muted" style="max-width:70ch">
       django best practices, python snippets, web performance checklist,
-      accessible components, product design tips, write better release
-      notes, README patterns, content design guidelines.
+      accessible components, product design tips, release notes guide,
+      README patterns, content design guidelines.
     </p>
   </div>
 

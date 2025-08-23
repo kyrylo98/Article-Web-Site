@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{% block account_title %}{% endblock %} — Aurora{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    {% block account_content %}{% endblock %}
+  </div>
+</section>
+{% endblock %}

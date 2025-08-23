@@ -81,3 +81,16 @@ def category_delete_view(request, pk: int):
         request, "categories/confirm_delete.html",
         {"category": category},
     )
+
+
+from django.db.models import Count
+from django.views.generic import ListView
+from .models import Category
+
+class CategoryListView(ListView):
+    template_name = "categories/list.html"
+    context_object_name = "categories"
+    paginate_by = 30
+
+    def get_queryset(self):
+        return Category.objects.annotate(article_count=Count("articles")).order_by("name")

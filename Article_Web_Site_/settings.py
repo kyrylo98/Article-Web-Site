@@ -53,6 +53,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",  # allauth
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "category.context_processors.nav_categories"
             ],
         },
     },

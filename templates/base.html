@@ -1,51 +1,80 @@
-{% load static socialaccount %}
+{% load static %}
+{% load socialaccount %}
+
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description"
-        content="Concise, practical articles on programming, web development
-                 and product design. Actionable guides, checklists and
-                 tutorials to level up your projects.">
-  <meta property="og:title" content="Aurora — simple, modern, readable">
-  <meta property="og:description"
-        content="Readable tech articles and guides to build better products.">
-  <meta property="og:type" content="website">
-  <title>Aurora</title>
-  <link rel="stylesheet" href="{% static 'style.css' %}?v=6">
+        content="Concise, practical articles on programming, web development and product design.">
+  <title>{% block title %}Aurora{% endblock %}</title>
+
+  <!-- обнови версию при изменениях стилей -->
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=7">
+  {% block meta %}{% endblock %}
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
 <header class="site-header">
   <div class="container nav">
-    <div class="nav-left">
-      <a class="brand" href="{% url 'articles:index' %}">Aurora</a>
-    </div>
+    <a class="brand" href="{% url 'articles:index' %}" aria-label="Aurora — home">Aurora</a>
 
-    <nav class="nav-right">
+    <nav class="nav-right" aria-label="Primary">
       <a href="{% url 'articles:index' %}">Articles</a>
+
+      <!-- Categories mega-menu -->
+      <details class="nav-account nav-cats">
+        <summary aria-haspopup="menu" aria-expanded="false">Categories</summary>
+        <div class="nav-dropdown nav-cats-panel" role="menu" aria-label="Categories">
+          <div class="cats-grid">
+            {% for cat in nav_categories %}
+              <a class="cat-tile" role="menuitem"
+                 href="{% url 'articles:index' %}?category={{ cat.pk }}">
+                <span class="cat-name">{{ cat.name }}</span>
+                <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
+              </a>
+            {% empty %}
+              <span class="muted">No categories yet</span>
+            {% endfor %}
+          </div>
+          <div class="cats-actions">
+            <a class="btn-link" href="{% url 'category:list' %}">All categories</a>
+            {% if request.user.is_staff %}
+              <a class="btn-link" href="{% url 'category:create' %}">+ New category</a>
+            {% endif %}
+          </div>
+        </div>
+      </details>
+
       <a href="{% url 'home' %}">Home</a>
 
       {% if request.user.is_authenticated %}
         <a href="{% url 'articles:create' %}">Write</a>
-        <a class="btn ghost" href="{% url 'users:account' %}">
-          My account
-        </a>
+        <a class="btn ghost" href="{% url 'users:account' %}">My account</a>
+
         <form action="{% url 'account_logout' %}" method="post"
               class="nav-logout" style="display:inline">
           {% csrf_token %}
           <button class="nav-link-btn" type="submit">Logout</button>
         </form>
       {% else %}
-        <a href="{% url 'account_login' %}">Login</a>
-        <a class="btn" href="{% url 'account_signup' %}">Register</a>
-        <a class="btn btn-google"
-           href="{% provider_login_url 'google' %}">
-          <!-- простой значок Google -->
-          <span style="font-weight:700;margin-right:.35rem">G</span>
-          Sign in with Google
-        </a>
+        <!-- Единая кнопка «Account» с выпадающим меню -->
+        <details class="nav-account">
+          <summary aria-haspopup="menu" aria-expanded="false">Account</summary>
+          <div class="nav-dropdown" role="menu" aria-label="Account">
+            <div class="row">
+              <a class="btn-link" role="menuitem" href="{% url 'account_login' %}">Login</a>
+              <a class="btn-link" role="menuitem" href="{% url 'account_signup' %}">Register</a>
+            </div>
+            <div class="divider"></div>
+            <a class="btn-google" role="menuitem"
+               href="{% provider_login_url 'google' %}">
+              <span class="g-badge" aria-hidden="true">G</span>
+              <span>Sign in with Google</span>
+            </a>
+          </div>
+        </details>
       {% endif %}
     </nav>
   </div>
@@ -58,39 +87,79 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div>
-        <h4>Explore</h4>
-        <p><a href="{% url 'articles:index' %}">Articles</a></p>
-        <p><a href="{% url 'articles:create' %}">Write</a></p>
+      <div class="footer-col">
+        <p class="footer-title">Explore</p>
+        <a class="footer-link" href="{% url 'articles:index' %}">Articles</a>
+        <a class="footer-link" href="{% url 'articles:create' %}">Write</a>
         {% if request.user.is_authenticated %}
-          <p><a href="{% url 'users:account' %}">My account</a></p>
+          <a class="footer-link" href="{% url 'users:account' %}">My account</a>
         {% else %}
-          <p><a href="{% url 'account_login' %}">Login</a></p>
+          <a class="footer-link" href="{% url 'account_login' %}">Login</a>
         {% endif %}
       </div>
 
-      <div>
-        <h4>Company</h4>
-        <p><a href="{% url 'pages:about' %}">About us</a></p>
-        <p><a href="{% url 'pages:blog' %}">Blog</a></p>
-        <p><a href="{% url 'pages:contact' %}">Contact</a></p>
+      <div class="footer-col">
+        <p class="footer-title">Company</p>
+        <a class="footer-link" href="{% url 'pages:about' %}">About us</a>
+        <a class="footer-link" href="{% url 'pages:blog' %}">Blog</a>
+        <a class="footer-link" href="{% url 'pages:contact' %}">Contact</a>
       </div>
 
-      <div>
-        <h4>Legal</h4>
-        <p><a href="{% url 'pages:privacy' %}">Privacy Policy</a></p>
-        <p><a href="{% url 'pages:terms' %}">Terms of Service</a></p>
-        <p><a href="{% url 'pages:cookies' %}">Cookie Policy</a></p>
+      <div class="footer-col">
+        <p class="footer-title">Legal</p>
+        <a class="footer-link" href="{% url 'pages:privacy' %}">Privacy Policy</a>
+        <a class="footer-link" href="{% url 'pages:terms' %}">Terms of Service</a>
+        <a class="footer-link" href="{% url 'pages:cookies' %}">Cookie Policy</a>
       </div>
     </div>
 
-    <div class="footer-bottom"
-         style="display:flex;justify-content:space-between;
-                align-items:center;margin-top:14px">
-      <div>© {% now "Y" %} Aurora. Built for readability.</div>
-      <a href="{% url 'pages:sitemap' %}">Sitemap</a>
+    <div class="footer-bottom">
+      <span class="footer-text">© {% now "Y" %} Aurora</span>
+      <a class="footer-link inline" href="{% url 'pages:sitemap' %}">Sitemap</a>
     </div>
   </div>
 </footer>
+
+<script>
+/* Закрытие всех <details> по клику вне и обновление aria-expanded */
+(function () {
+  function closeOthers(except) {
+    document.querySelectorAll('details.nav-account[open]').forEach(d => {
+      if (d !== except) {
+        d.removeAttribute('open');
+        const s = d.querySelector('summary'); if (s) s.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const openDetails = document.querySelectorAll('details.nav-account');
+    openDetails.forEach(d => {
+      const summary = d.querySelector('summary');
+      if (summary && summary.contains(e.target)) {
+        const willOpen = !d.hasAttribute('open');
+        closeOthers(willOpen ? d : null);
+        requestAnimationFrame(() => {
+          summary.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+      } else if (d.hasAttribute('open') && !d.contains(e.target)) {
+        d.removeAttribute('open');
+        if (summary) summary.setAttribute('aria-expanded','false');
+      }
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('details.nav-account[open]').forEach(d => {
+        d.removeAttribute('open');
+        const s = d.querySelector('summary'); if (s) s.setAttribute('aria-expanded','false');
+      });
+    }
+  });
+})();
+</script>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -38,9 +38,8 @@ urlpatterns = [
              template_name="registration/password_change_done.html"
          ),
          name="password_change_done"),
-    path("categories/", include("category.urls",
-                                namespace="categories")),
-
+    path("categories/", include(("category.urls", "category"),
+                                namespace="category")),
     path("", include(("pages.urls", "pages"), namespace="pages")),
 
     path("accounts/", include("allauth.urls")),

@@ -8,8 +8,7 @@
 
     <div style="display:flex;gap:24px;align-items:flex-start">
       {% if request.user.avatar %}
-        <img src="{{ request.user.avatar.url }}"
-             alt="Avatar"
+        <img src="{{ request.user.avatar.url }}" alt="Avatar"
              style="width:96px;height:96px;border-radius:50%;
                     object-fit:cover;box-shadow:var(--shadow)">
       {% endif %}
@@ -17,18 +16,20 @@
       <ul style="list-style:none;margin:0;padding:0;line-height:1.9">
         <li><strong>Username:</strong> {{ request.user.username }}</li>
         <li><strong>Email:</strong> {{ request.user.email|default:"—" }}</li>
-        <li><strong>Joined:</strong>
-            {{ request.user.date_joined|date:"Y-m-d" }}</li>
-        <li><strong>Verified:</strong>
-            {{ request.user.is_verified|yesno:"Yes,No" }}</li>
+        <li><strong>Joined:</strong> {{ request.user.date_joined|date:"Y-m-d" }}</li>
+        <li><strong>Verified:</strong> {{ request.user.is_verified|yesno:"Yes,No" }}</li>
         <li><strong>Rating:</strong> {{ request.user.rating }}</li>
       </ul>
     </div>
 
-    <p style="margin-top:20px;display:flex;gap:12px">
-      <a class="cta" href="/password_change/">Change password</a>
-      <a class="cta secondary" href="/logout/">Logout</a>
-    </p>
+    <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+      {% if request.user.has_usable_password %}
+        <a class="cta" href="{% url 'account_change_password' %}">Change password</a>
+      {% else %}
+        <a class="cta" href="{% url 'account_set_password' %}">Set a password</a>
+      {% endif %}
+        {% csrf_token %}
+    </div>
   </div>
 </section>
 {% endblock %}
