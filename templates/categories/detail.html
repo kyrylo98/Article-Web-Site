@@ -1,29 +1,40 @@
 {% extends "base.html" %}
+
 {% block content %}
 <section class="section container">
   <p class="kicker">Category</p>
   <h1 class="page-title">{{ category.name }}</h1>
-  {% if category.description %}
-    <p class="muted">{{ category.description }}</p>
+  {% if request.user.is_staff %}
+    <p class="mt">
+      <a class="cta secondary" href="{% url 'categories:edit' category.pk %}">Edit</a>
+      <a class="cta secondary" href="{% url 'categories:delete' category.pk %}">Delete</a>
+    </p>
   {% endif %}
 
-  <div class="card-grid mt">
-    {% for item in page_obj %}
+  <div class="card-grid">
+    {% for a in articles %}
       <article class="card">
-        <a href="{% url 'articles:detail' item.pk %}">
-          <h3 class="m0">{{ item.title }}</h3>
-        </a>
-        <p class="muted m0">{{ item.description }}</p>
+        <a href="{% url 'articles:detail' a.pk %}"><h3 class="m0">{{ a.title }}</h3></a>
+        <p class="muted m0">{{ a.description }}</p>
         <p class="badge m0">
-          {{ item.published_at|date:'M j, Y' }}
-          • {{ item.reading_minutes }} min read
+          {{ a.published_at|date:"M j, Y" }} • {{ a.reading_minutes }} min read
         </p>
       </article>
     {% empty %}
-      <p>No articles in this category yet.</p>
+      <p class="muted">No articles yet in this category.</p>
     {% endfor %}
   </div>
 
-  {% include "includes/pagination.html" %}
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a class="btn-link" href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+      {% endif %}
+      <span class="muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="btn-link" href="?page={{ page_obj.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
 </section>
 {% endblock %}

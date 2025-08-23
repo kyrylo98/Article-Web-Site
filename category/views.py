@@ -1,42 +1,46 @@
+# category/views.py
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
+
 from .models import Category
 from articles.models import Article
 
 
 def categories_list_view(request):
-    query = request.GET.get("q", "").strip()
-    qs = Category.objects.all()
-    if query:
-        qs = qs.filter(name__icontains=query)
+    search = request.GET.get("q", "").strip()
+    qs = Category.objects.annotate(article_count=Count("articles")).order_by("name")
+    if search:
+        qs = qs.filter(name__icontains=search)
 
-    paginator = Paginator(qs, 20)
-    page = request.GET.get("page")
-    page_obj = paginator.get_page(page)
+    paginator = Paginator(qs, 30)
+    page_obj = paginator.get_page(request.GET.get("page"))
 
-    return render(
-        request,
-        "categories/list.html",
-        {"page_obj": page_obj, "query": query},
-    )
+    context = {
+        "categories": page_obj.object_list,
+        "page_obj": page_obj,
+        "is_paginated": page_obj.paginator.num_pages > 1,
+        "search": search,
+    }
+    return render(request, "categories/list.html", context)
 
 
 def category_detail_view(request, pk: int):
     category = get_object_or_404(Category, pk=pk)
-    qs = Article.objects.filter(
-        category=category, is_published=True
-    ).order_by("-published_at")
-
-    paginator = Paginator(qs, 10)
-    page = request.GET.get("page")
-    page_obj = paginator.get_page(page)
+    qs = (
+        Article.objects.filter(category=category, is_published=True)
+        .select_related("author", "category")
+        .order_by("-published_at")
+    )
+    paginator = Paginator(qs, 12)
+    page_obj = paginator.get_page(request.GET.get("page"))
 
     return render(
         request,
         "categories/detail.html",
-        {"category": category, "page_obj": page_obj},
+        {"category": category, "page_obj": page_obj, "is_paginated": page_obj.paginator.num_pages > 1},
     )
 
 
@@ -64,10 +68,7 @@ def category_edit_view(request, pk: int):
             category.description = description
             category.save(update_fields=["name", "description"])
             return redirect("categories:index")
-    return render(
-        request, "categories/form.html",
-        {"mode": "edit", "category": category},
-    )
+    return render(request, "categories/form.html", {"mode": "edit", "category": category})
 
 
 @staff_member_required
@@ -77,20 +78,4 @@ def category_delete_view(request, pk: int):
     if request.method == "POST":
         category.delete()
         return redirect("categories:index")
-    return render(
-        request, "categories/confirm_delete.html",
-        {"category": category},
-    )
-
-
-from django.db.models import Count
-from django.views.generic import ListView
-from .models import Category
-
-class CategoryListView(ListView):
-    template_name = "categories/list.html"
-    context_object_name = "categories"
-    paginate_by = 30
-
-    def get_queryset(self):
-        return Category.objects.annotate(article_count=Count("articles")).order_by("name")
+    return render(request, "categories/confirm_delete.html", {"category": category})

@@ -38,14 +38,12 @@ urlpatterns = [
              template_name="registration/password_change_done.html"
          ),
          name="password_change_done"),
-    path("categories/", include(("category.urls", "category"),
-                                namespace="category")),
+    path("categories/", include("category.urls", namespace="categories")),
     path("", include(("pages.urls", "pages"), namespace="pages")),
 
     path("accounts/", include("allauth.urls")),
 ]
 
-# Медиа/статика в разработке
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)

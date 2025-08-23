@@ -1,5 +1,4 @@
-{% load static %}
-{% load socialaccount %}
+{% load static socialaccount %}
 
 <!doctype html>
 <html lang="en">
@@ -10,8 +9,9 @@
         content="Concise, practical articles on programming, web development and product design.">
   <title>{% block title %}Aurora{% endblock %}</title>
 
-  <!-- обнови версию при изменениях стилей -->
-  <link rel="stylesheet" href="{% static 'style.css' %}?v=7">
+  <!-- bump версию при изменении стилей -->
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=9">
+
   {% block meta %}{% endblock %}
   {% block extra_head %}{% endblock %}
 </head>
@@ -26,22 +26,27 @@
       <!-- Categories mega-menu -->
       <details class="nav-account nav-cats">
         <summary aria-haspopup="menu" aria-expanded="false">Categories</summary>
-        <div class="nav-dropdown nav-cats-panel" role="menu" aria-label="Categories">
+
+        <!-- Прокручиваемая панель -->
+        <div class="nav-dropdown nav-cats-panel" tabindex="-1" role="menu" aria-label="Categories">
           <div class="cats-grid">
-            {% for cat in nav_categories %}
-              <a class="cat-tile" role="menuitem"
-                 href="{% url 'articles:index' %}?category={{ cat.pk }}">
-                <span class="cat-name">{{ cat.name }}</span>
-                <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
-              </a>
-            {% empty %}
+            {% if nav_categories %}
+              {% for cat in nav_categories %}
+                <a class="cat-tile" role="menuitem"
+                   href="{% url 'articles:index' %}?category={{ cat.pk }}">
+                  <span class="cat-name">{{ cat.name }}</span>
+                  <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
+                </a>
+              {% endfor %}
+            {% else %}
               <span class="muted">No categories yet</span>
-            {% endfor %}
+            {% endif %}
           </div>
+
           <div class="cats-actions">
-            <a class="btn-link" href="{% url 'category:list' %}">All categories</a>
+            <a class="btn-link" href="{% url 'categories:index' %}">All categories</a>
             {% if request.user.is_staff %}
-              <a class="btn-link" href="{% url 'category:create' %}">+ New category</a>
+              <a class="btn-link" href="{% url 'categories:create' %}">+ New category</a>
             {% endif %}
           </div>
         </div>
@@ -53,13 +58,12 @@
         <a href="{% url 'articles:create' %}">Write</a>
         <a class="btn ghost" href="{% url 'users:account' %}">My account</a>
 
-        <form action="{% url 'account_logout' %}" method="post"
-              class="nav-logout" style="display:inline">
+        <form action="{% url 'account_logout' %}" method="post" class="nav-logout" style="display:inline">
           {% csrf_token %}
           <button class="nav-link-btn" type="submit">Logout</button>
         </form>
       {% else %}
-        <!-- Единая кнопка «Account» с выпадающим меню -->
+        <!-- Одна кнопка «Account» с меню логина -->
         <details class="nav-account">
           <summary aria-haspopup="menu" aria-expanded="false">Account</summary>
           <div class="nav-dropdown" role="menu" aria-label="Account">
@@ -68,8 +72,7 @@
               <a class="btn-link" role="menuitem" href="{% url 'account_signup' %}">Register</a>
             </div>
             <div class="divider"></div>
-            <a class="btn-google" role="menuitem"
-               href="{% provider_login_url 'google' %}">
+            <a class="btn-google" role="menuitem" href="{% provider_login_url 'google' %}">
               <span class="g-badge" aria-hidden="true">G</span>
               <span>Sign in with Google</span>
             </a>
@@ -121,22 +124,24 @@
 </footer>
 
 <script>
-/* Закрытие всех <details> по клику вне и обновление aria-expanded */
+/* Закрыть все <details> по клику вне/ESC + поддерживать aria-expanded */
 (function () {
   function closeOthers(except) {
     document.querySelectorAll('details.nav-account[open]').forEach(d => {
       if (d !== except) {
         d.removeAttribute('open');
-        const s = d.querySelector('summary'); if (s) s.setAttribute('aria-expanded','false');
+        const s = d.querySelector('summary');
+        if (s) s.setAttribute('aria-expanded', 'false');
       }
     });
   }
 
   document.addEventListener('click', (e) => {
-    const openDetails = document.querySelectorAll('details.nav-account');
-    openDetails.forEach(d => {
+    document.querySelectorAll('details.nav-account').forEach(d => {
       const summary = d.querySelector('summary');
-      if (summary && summary.contains(e.target)) {
+      if (!summary) return;
+
+      if (summary.contains(e.target)) {
         const willOpen = !d.hasAttribute('open');
         closeOthers(willOpen ? d : null);
         requestAnimationFrame(() => {
@@ -144,7 +149,7 @@
         });
       } else if (d.hasAttribute('open') && !d.contains(e.target)) {
         d.removeAttribute('open');
-        if (summary) summary.setAttribute('aria-expanded','false');
+        summary.setAttribute('aria-expanded', 'false');
       }
     });
   });
@@ -153,7 +158,8 @@
     if (e.key === 'Escape') {
       document.querySelectorAll('details.nav-account[open]').forEach(d => {
         d.removeAttribute('open');
-        const s = d.querySelector('summary'); if (s) s.setAttribute('aria-expanded','false');
+        const s = d.querySelector('summary');
+        if (s) s.setAttribute('aria-expanded', 'false');
       });
     }
   });
