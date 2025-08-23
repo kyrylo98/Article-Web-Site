@@ -40,6 +40,10 @@ urlpatterns = [
          name="password_change_done"),
     path("categories/", include("category.urls",
                                 namespace="categories")),
+
+    path("", include(("pages.urls", "pages"), namespace="pages")),
+
+    path("accounts/", include("allauth.urls")),
 ]
 
 # Медиа/статика в разработке

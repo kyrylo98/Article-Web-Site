@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-  {% if form.instance.pk %}Edit{% else %}Create{% endif %} article
+  {% if form.instance.pk %}Edit article{% else %}Create article{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -13,44 +13,39 @@
         {% if form.instance.pk %}Edit{% else %}Create{% endif %} article
       </h1>
       <p class="page-sub">
-        Keep titles short. Add a clear description. Choose a category
-        to help readers discover your post.
+        Write modern, clean articles. Keep it short and readable.
       </p>
     </div>
-
-    {% if form.non_field_errors %}
-      <div class="alert">
-        {% for err in form.non_field_errors %}
-          <div class="error">{{ err }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
 
     <div class="card card--glass form-card">
       <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
 
+        {% if form.non_field_errors %}
+          <div class="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
         <!-- Title -->
         <div class="field">
           {{ form.title.label_tag }}
           {{ form.title }}
-          {% for err in form.title.errors %}
-            <div class="error">{{ err }}</div>
-          {% endfor %}
+          {% if form.title.errors %}
+            <div class="error">{{ form.title.errors|striptags }}</div>
+          {% endif %}
         </div>
 
-        <!-- Description with live counter -->
+        <!-- Description with counter -->
         <div class="field">
           <div class="label-row">
             {{ form.description.label_tag }}
-            <span class="muted" id="description-count">0/160</span>
+            <span class="muted" id="desc-count">0/160</span>
           </div>
           {{ form.description }}
-          {% for err in form.description.errors %}
-            <div class="error">{{ err }}</div>
-          {% endfor %}
+          {% if form.description.errors %}
+            <div class="error">{{ form.description.errors|striptags }}</div>
+          {% endif %}
           <p class="hint">
-            Short teaser shown on listing pages (up to ~160 chars).
+            Short summary (≤ 160 characters) for list and SEO.
           </p>
         </div>
 
@@ -58,46 +53,35 @@
         <div class="field">
           {{ form.category.label_tag }}
           {{ form.category }}
-          {% for err in form.category.errors %}
-            <div class="error">{{ err }}</div>
-          {% endfor %}
-          <p class="hint">Pick a category so readers can filter content.</p>
+          {% if form.category.errors %}
+            <div class="error">{{ form.category.errors|striptags }}</div>
+          {% endif %}
+          <p class="hint">Choose a category for better navigation.</p>
         </div>
 
-        <!-- Image with filename + preview -->
+        <!-- Image with pretty file name -->
         <div class="field">
           {{ form.image.label_tag }}
-          <div class="file">
+          <div class="file-wrap">
             {{ form.image }}
-            <span class="file-name" id="image-file-name">No file chosen</span>
+            <span class="file-cta">Choose image</span>
+            <span class="file-name" id="file-name">No file chosen</span>
           </div>
-          {% if form.instance.pk and form.instance.image %}
-            <div class="field mt">
-              <img id="image-preview-current"
-                   src="{{ form.instance.image.url }}"
-                   alt="Current cover"
-                   style="width:160px;height:auto;border-radius:12px">
-              <p class="hint">Current cover image</p>
-            </div>
+          {% if form.image.errors %}
+            <div class="error">{{ form.image.errors|striptags }}</div>
           {% endif %}
-          <img id="image-preview-new" alt=""
-               style="display:none;width:160px;height:auto;border-radius:12px">
-          {% for err in form.image.errors %}
-            <div class="error">{{ err }}</div>
-          {% endfor %}
-          <p class="hint">PNG/JPG up to ~5MB.</p>
         </div>
 
-        <!-- Body with reading time -->
+        <!-- Body with read time -->
         <div class="field">
           <div class="label-row">
             {{ form.body.label_tag }}
-            <span class="muted" id="read-time">~ 1 min read</span>
+            <span class="muted" id="read-meter">~ 1 min read</span>
           </div>
           {{ form.body }}
-          {% for err in form.body.errors %}
-            <div class="error">{{ err }}</div>
-          {% endfor %}
+          {% if form.body.errors %}
+            <div class="error">{{ form.body.errors|striptags }}</div>
+          {% endif %}
         </div>
 
         <!-- Published -->
@@ -105,29 +89,23 @@
           <label class="checkbox" for="{{ form.is_published.id_for_label }}">
             {{ form.is_published }} <span>Published?</span>
           </label>
-          {% for err in form.is_published.errors %}
-            <div class="error">{{ err }}</div>
-          {% endfor %}
         </div>
 
         <!-- Actions -->
         <div class="actions">
           <button class="cta" type="submit">Save</button>
-          <a class="cta secondary"
-             href="{% if form.instance.pk %}
-                     {% url 'articles:detail' form.instance.pk %}
-                   {% else %}
-                     {% url 'articles:index' %}
-                   {% endif %}">
-            Cancel
-          </a>
-          {% if request.user.is_authenticated and form.instance.pk and
-                (request.user.is_staff or
-                 request.user.pk == form.instance.author_id) %}
-            <a class="cta secondary"
-               href="{% url 'articles:delete' form.instance.pk %}">
-              Delete
-            </a>
+          <a class="cta secondary" href="{% url 'articles:index' %}">Cancel</a>
+
+          {# Delete — только автору или staff. Без скобок, только вложенные if. #}
+          {% if request.user.is_authenticated %}
+            {% if form.instance.pk %}
+              {% if request.user.is_staff or request.user.pk == form.instance.author_id %}
+                <a class="cta secondary"
+                   href="{% url 'articles:delete' form.instance.pk %}">
+                  Delete
+                </a>
+              {% endif %}
+            {% endif %}
           {% endif %}
         </div>
       </form>
@@ -137,82 +115,48 @@
 </section>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const descriptionInput = document.getElementById(
-    "{{ form.description.id_for_label }}"
-  );
-  const descriptionCount = document.getElementById("description-count");
+(function () {
+  function byId(id) { return document.getElementById(id); }
 
-  const bodyInput = document.getElementById(
-    "{{ form.body.id_for_label }}"
-  );
-  const readTime = document.getElementById("read-time");
+  var descId   = "{{ form.description.id_for_label }}";
+  var bodyId   = "{{ form.body.id_for_label }}";
+  var imageId  = "{{ form.image.id_for_label }}";
 
-  const imageInput = document.getElementById(
-    "{{ form.image.id_for_label }}"
-  );
-  const imageFileName = document.getElementById("image-file-name");
-  const imagePreviewNew = document.getElementById("image-preview-new");
-  const imagePreviewCurrent = document.getElementById(
-    "image-preview-current"
-  );
+  var descEl       = descId ? byId(descId) : null;
+  var descCountEl  = byId("desc-count");
+  var bodyEl       = bodyId ? byId(bodyId) : null;
+  var readMeterEl  = byId("read-meter");
+  var fileInputEl  = imageId ? byId(imageId) : null;
+  var fileNameEl   = byId("file-name");
 
-  function updateDescriptionCount() {
-    if (!descriptionInput || !descriptionCount) return;
-    const length = (descriptionInput.value || "").length;
-    descriptionCount.textContent = length + "/160";
+  function updateDescCounter() {
+    if (!descEl || !descCountEl) return;
+    var len = (descEl.value || "").length;
+    if (len > 160) len = 160;
+    descCountEl.textContent = len + "/160";
   }
 
-  function wordsCount(text) {
-    return (text || "")
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean).length;
+  function estimateMinutes(text) {
+    var words = (text || "").trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
   }
 
-  function updateReadTime() {
-    if (!bodyInput || !readTime) return;
-    const words = wordsCount(bodyInput.value);
-    const minutes = Math.max(1, Math.round(words / 200));
-    readTime.textContent = "~ " + minutes + " min read";
+  function updateReadMeter() {
+    if (!bodyEl || !readMeterEl) return;
+    readMeterEl.textContent = "~ " + estimateMinutes(bodyEl.value) + " min read";
   }
 
-  function updateImageInfo() {
-    if (!imageInput || !imageFileName) return;
-    if (imageInput.files && imageInput.files.length) {
-      imageFileName.textContent = imageInput.files[0].name;
-
-      const file = imageInput.files[0];
-      if (file && file.type.startsWith("image/") && imagePreviewNew) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          imagePreviewNew.src = e.target.result;
-          imagePreviewNew.style.display = "block";
-          if (imagePreviewCurrent) {
-            imagePreviewCurrent.style.display = "none";
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    } else {
-      imageFileName.textContent = "No file chosen";
-      if (imagePreviewNew) imagePreviewNew.style.display = "none";
-      if (imagePreviewCurrent) imagePreviewCurrent.style.display = "block";
-    }
+  function updateFileName() {
+    if (!fileInputEl || !fileNameEl) return;
+    fileNameEl.textContent =
+      (fileInputEl.files && fileInputEl.files.length)
+        ? fileInputEl.files[0].name
+        : "No file chosen";
   }
 
-  if (descriptionInput) {
-    updateDescriptionCount();
-    descriptionInput.addEventListener("input", updateDescriptionCount);
-  }
-  if (bodyInput) {
-    updateReadTime();
-    bodyInput.addEventListener("input", updateReadTime);
-  }
-  if (imageInput) {
-    updateImageInfo();
-    imageInput.addEventListener("change", updateImageInfo);
-  }
-});
+  if (descEl)  { updateDescCounter(); descEl.addEventListener("input", updateDescCounter); }
+  if (bodyEl)  { updateReadMeter();   bodyEl.addEventListener("input", updateReadMeter); }
+  if (fileInputEl) { updateFileName(); fileInputEl.addEventListener("change", updateFileName); }
+})();
 </script>
 {% endblock %}

@@ -1,17 +1,20 @@
-{% load static %}
+{% load static socialaccount %}
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1">
   <meta name="description"
         content="Concise, practical articles on programming, web development
                  and product design. Actionable guides, checklists and
                  tutorials to level up your projects.">
+  <meta property="og:title" content="Aurora — simple, modern, readable">
+  <meta property="og:description"
+        content="Readable tech articles and guides to build better products.">
+  <meta property="og:type" content="website">
   <title>Aurora</title>
-
-  <!-- обнови версию, чтобы стили точно подтянулись -->
-  <link rel="stylesheet" href="{% static 'style.css' %}?v=5">
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=6">
 </head>
 <body>
 <header class="site-header">
@@ -26,15 +29,23 @@
 
       {% if request.user.is_authenticated %}
         <a href="{% url 'articles:create' %}">Write</a>
-        <a href="{% url 'users:account' %}" class="btn btn-small">My account</a>
-        <a href="{% url 'categories:index' %}">Categories</a>
-
-        <form action="{% url 'logout' %}" method="post" class="nav-logout">
+        <a class="btn ghost" href="{% url 'users:account' %}">
+          My account
+        </a>
+        <form action="{% url 'account_logout' %}" method="post"
+              class="nav-logout" style="display:inline">
           {% csrf_token %}
-          <button type="submit" class="nav-link-btn">Logout</button>
+          <button class="nav-link-btn" type="submit">Logout</button>
         </form>
       {% else %}
-        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'account_login' %}">Login</a>
+        <a class="btn" href="{% url 'account_signup' %}">Register</a>
+        <a class="btn btn-google"
+           href="{% provider_login_url 'google' %}">
+          <!-- простой значок Google -->
+          <span style="font-weight:700;margin-right:.35rem">G</span>
+          Sign in with Google
+        </a>
       {% endif %}
     </nav>
   </div>
@@ -47,48 +58,37 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <section class="footer-col">
-        <h4 class="footer-title">About Aurora</h4>
-        <p class="footer-text">
-          Aurora is a clean, fast reading experience for developers and
-          makers. We publish practical, no-fluff articles that help you ship
-          better products faster.
-        </p>
-      </section>
-
-      <section class="footer-col">
-        <h4 class="footer-title">Explore</h4>
-        <a class="footer-link" href="{% url 'articles:index' %}">Articles</a>
-        <a class="footer-link" href="{% url 'articles:create' %}">Write</a>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="{% url 'articles:index' %}">Articles</a></p>
+        <p><a href="{% url 'articles:create' %}">Write</a></p>
         {% if request.user.is_authenticated %}
-          <a class="footer-link" href="{% url 'users:account' %}">
-            My account
-          </a>
+          <p><a href="{% url 'users:account' %}">My account</a></p>
         {% else %}
-          <a class="footer-link" href="{% url 'login' %}">Login</a>
+          <p><a href="{% url 'account_login' %}">Login</a></p>
         {% endif %}
-      </section>
+      </div>
 
-      <section class="footer-col">
-        <h4 class="footer-title">Company</h4>
-        <a class="footer-link" href="#">About us</a>
-        <a class="footer-link" href="#">Blog</a>
-        <a class="footer-link" href="#">Contact</a>
-      </section>
+      <div>
+        <h4>Company</h4>
+        <p><a href="{% url 'pages:about' %}">About us</a></p>
+        <p><a href="{% url 'pages:blog' %}">Blog</a></p>
+        <p><a href="{% url 'pages:contact' %}">Contact</a></p>
+      </div>
 
-      <section class="footer-col">
-        <h4 class="footer-title">Legal</h4>
-        <a class="footer-link" href="#">Privacy Policy</a>
-        <a class="footer-link" href="#">Terms of Service</a>
-        <a class="footer-link" href="#">Cookie Policy</a>
-      </section>
+      <div>
+        <h4>Legal</h4>
+        <p><a href="{% url 'pages:privacy' %}">Privacy Policy</a></p>
+        <p><a href="{% url 'pages:terms' %}">Terms of Service</a></p>
+        <p><a href="{% url 'pages:cookies' %}">Cookie Policy</a></p>
+      </div>
     </div>
 
-    <div class="footer-bottom">
-      <span>© {% now "Y" %} Aurora. Built for readability.</span>
-      <span>
-        <a class="footer-link inline" href="#">Sitemap</a>
-      </span>
+    <div class="footer-bottom"
+         style="display:flex;justify-content:space-between;
+                align-items:center;margin-top:14px">
+      <div>© {% now "Y" %} Aurora. Built for readability.</div>
+      <a href="{% url 'pages:sitemap' %}">Sitemap</a>
     </div>
   </div>
 </footer>

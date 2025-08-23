@@ -299,3 +299,5 @@ label{display:block;font-weight:600;margin-bottom:8px;color:var(--text)}
   color: #0b1020;
   font-weight: 700;
 }
+.google-btn { display:inline-flex; align-items:center; gap:8px; }
+.gicon { display:inline-flex; align-items:center; }

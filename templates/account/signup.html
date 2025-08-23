@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}Register — Aurora{% endblock %}
+
+{% block content %}
+<section class="section container">
+  <div class="hero-gradient">
+    <h1 class="page-title">Create account</h1>
+    <p class="page-sub">A minute to join and start writing.</p>
+  </div>
+
+  <div class="card form-card">
+    <a class="cta google-btn"
+       href="{% provider_login_url 'google' process='signup' %}">
+      <span class="gicon" aria-hidden="true">
+        <!-- тот же SVG -->
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335"
+            d="M24 9.5c3.5 0 6.7 1.2 9.2 3.6l6.9-6.9C35.9 2.3 30.3 0 24 0
+               14.6 0 6.5 5.4 2.5 13.3l8.3 6.4C12.9 13.9 18 9.5 24 9.5z"/>
+          <path fill="#4285F4"
+            d="M46.1 24.5c0-1.7-.2-3.3-.5-4.9H24v9.2h12.4c-.5 2.7-2.1
+               5-4.5 6.6l7 5.4c4.1-3.8 6.2-9.4 6.2-16.3z"/>
+          <path fill="#FBBC05"
+            d="M10.8 28.3c-1-2.7-1-5.6 0-8.3l-8.3-6.4C.9 17.4 0 20.6 0
+               24s.9 6.6 2.5 10.4l8.3-6.1z"/>
+          <path fill="#34A853"
+            d="M24 48c6.4 0 11.8-2.1 15.8-5.8l-7-5.4c-2 1.3-4.5
+               2-8.8 2-6 0-11.1-4.3-13.1-10.1l-8.3 6.1C6.5 42.6 14.6 48 24 48z"/>
+        </svg>
+      </span>
+      Sign up with Google
+    </a>
+
+    <div class="muted" style="margin:10px 0;text-align:center;">or</div>
+
+    <form method="post" action="{% url 'account_signup' %}" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="field">
+        {{ form.username.label_tag }} {{ form.username }}
+        {{ form.username.errors }}
+      </div>
+      <div class="field">
+        {{ form.email.label_tag }} {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+      <div class="field">
+        {{ form.password1.label_tag }} {{ form.password1 }}
+        {{ form.password1.errors }}
+      </div>
+      <div class="field">
+        {{ form.password2.label_tag }} {{ form.password2 }}
+        {{ form.password2.errors }}
+      </div>
+      <div class="actions">
+        <button class="cta" type="submit">Create account</button>
+        <a class="cta secondary" href="{% url 'account_login' %}">
+          I have an account
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

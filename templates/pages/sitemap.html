@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Sitemap — Aurora{% endblock %}
+{% block content %}
+<section class="section container prose">
+  <h1 class="page-title">Sitemap</h1>
+  <ul>
+    <li><a href="{% url 'articles:index' %}">Articles</a></li>
+    <li><a href="{% url 'articles:create' %}">Write an article</a></li>
+    {% if request.user.is_authenticated %}
+      <li><a href="{% url 'users:account' %}">My account</a></li>
+    {% endif %}
+    <li><a href="{% url 'pages:about' %}">About us</a></li>
+    <li><a href="{% url 'pages:blog' %}">Blog</a></li>
+    <li><a href="{% url 'pages:contact' %}">Contact</a></li>
+    <li><a href="{% url 'pages:privacy' %}">Privacy Policy</a></li>
+    <li><a href="{% url 'pages:terms' %}">Terms of Service</a></li>
+    <li><a href="{% url 'pages:cookies' %}">Cookie Policy</a></li>
+  </ul>
+</section>
+{% endblock %}
