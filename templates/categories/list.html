@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section container">
+  <h1 class="page-title">Categories</h1>
+
+  <form class="search" method="get">
+    <input class="input" type="search" name="q"
+           value="{{ query }}" placeholder="Search categories…">
+    <button class="btn" type="submit">Search</button>
+  </form>
+
+  <div class="card-grid mt">
+    {% for cat in page_obj %}
+      <article class="card">
+        <h3 class="m0">
+          <a href="{% url 'categories:detail' cat.pk %}">{{ cat.name }}</a>
+        </h3>
+        {% if cat.description %}
+          <p class="muted m0">{{ cat.description }}</p>
+        {% endif %}
+      </article>
+    {% empty %}
+      <p>No categories yet.</p>
+    {% endfor %}
+  </div>
+
+  {% include "includes/pagination.html" %}
+</section>
+{% endblock %}

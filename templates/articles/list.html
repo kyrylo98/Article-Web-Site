@@ -4,6 +4,17 @@
 <section class="section container">
   <h1 class="page-title">Articles</h1>
 
+  <div class="chips">
+  <a class="chip {% if not active_category %}active{% endif %}"
+     href="{% url 'articles:index' %}">All</a>
+   {% for cat in categories %}
+    <a class="chip {% if active_category == cat.pk|stringformat:'s' %}active{% endif %}"
+       href="{% url 'articles:index' %}?category={{ cat.pk }}">
+      {{ cat.name }}
+    </a>
+    {% endfor %}
+  </div>
+
   <div class="card-grid">
     {% for item in page_obj %}
       <article class="card">
@@ -11,10 +22,12 @@
           <h3 class="m0">{{ item.title }}</h3>
         </a>
         <p class="muted m0">{{ item.description }}</p>
-        <p class="badge m0">
-          {{ item.published_at|date:"M j, Y" }}
-          • {{ item.reading_minutes }} min read
-        </p>
+         <p class="badge m0">
+          {% with pub=item.published_at|date:"M j, Y" %}
+            {{ pub }} • {{ item.reading_minutes }} min read
+          {% endwith %}
+         </p>
+
 
         {% if request.user.is_authenticated %}
           {% if request.user.is_staff or request.user.pk == item.author_id %}

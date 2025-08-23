@@ -6,7 +6,7 @@ from .models import Article
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ("title", "description", "image", "body", "is_published")
+        fields = ("title", "description", "image", "body", "is_published", "category")
         widgets = {
             "title": forms.TextInput(attrs={
                 "class": "input", "placeholder": "Awesome headline"
@@ -17,4 +17,5 @@ class ArticleForm(forms.ModelForm):
             "body": forms.Textarea(attrs={
                 "class": "textarea", "placeholder": "Write your article..."
             }),
+            "category": forms.Select(attrs={"class": "select"}),
         }

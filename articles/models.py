@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
+from category.models import Category
+
 
 def article_image_path(instance, filename) -> str:
     prefix = instance.pk or "new"
@@ -22,6 +24,15 @@ class Article(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="articles",
+
+    )
+    category = models.ForeignKey(
+        Category,
+        verbose_name="Category",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="articles",
     )
 
     class Meta:
@@ -37,4 +48,3 @@ class Article(models.Model):
     def reading_minutes(self) -> int:
         words = len(self.body.split())
         return max(1, words // 200)
-

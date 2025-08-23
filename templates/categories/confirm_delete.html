@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section container">
+  <h1 class="page-title">Delete category</h1>
+  <p>Delete “{{ category.name }}” permanently?</p>
+  <form method="post" class="actions">
+    {% csrf_token %}
+    <button class="btn danger" type="submit">Delete</button>
+    <a class="btn ghost" href="{% url 'categories:index' %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

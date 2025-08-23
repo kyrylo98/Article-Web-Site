@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section container">
+  <h1 class="page-title">
+    {% if mode == "edit" %}Edit category{% else %}Create category{% endif %}
+  </h1>
+
+  {% if not request.user.is_staff %}
+    <p class="alert">Only staff can manage categories.</p>
+  {% endif %}
+
+  <form method="post" class="card card--glass form-card">
+    {% csrf_token %}
+    <div class="field">
+      <label for="id_name">Name</label>
+      <input id="id_name" name="name" class="input"
+             value="{{ category.name|default_if_none:'' }}">
+    </div>
+
+    <div class="field">
+      <label for="id_desc">Description</label>
+      <textarea id="id_desc" name="description"
+                class="textarea">{{ category.description }}</textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="submit">Save</button>
+      <a class="btn ghost" href="{% url 'categories:index' %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

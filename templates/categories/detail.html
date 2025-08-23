@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section container">
+  <p class="kicker">Category</p>
+  <h1 class="page-title">{{ category.name }}</h1>
+  {% if category.description %}
+    <p class="muted">{{ category.description }}</p>
+  {% endif %}
+
+  <div class="card-grid mt">
+    {% for item in page_obj %}
+      <article class="card">
+        <a href="{% url 'articles:detail' item.pk %}">
+          <h3 class="m0">{{ item.title }}</h3>
+        </a>
+        <p class="muted m0">{{ item.description }}</p>
+        <p class="badge m0">
+          {{ item.published_at|date:'M j, Y' }}
+          • {{ item.reading_minutes }} min read
+        </p>
+      </article>
+    {% empty %}
+      <p>No articles in this category yet.</p>
+    {% endfor %}
+  </div>
+
+  {% include "includes/pagination.html" %}
+</section>
+{% endblock %}

@@ -27,6 +27,7 @@
       {% if request.user.is_authenticated %}
         <a href="{% url 'articles:create' %}">Write</a>
         <a href="{% url 'users:account' %}" class="btn btn-small">My account</a>
+        <a href="{% url 'categories:index' %}">Categories</a>
 
         <form action="{% url 'logout' %}" method="post" class="nav-logout">
           {% csrf_token %}
