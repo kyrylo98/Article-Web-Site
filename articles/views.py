@@ -12,6 +12,7 @@ from .forms import ArticleForm
 from .models import Article
 
 
+# articles/views.py
 class HomeListView(ListView):
     model = Article
     template_name = "articles/list.html"
@@ -19,34 +20,49 @@ class HomeListView(ListView):
     paginate_by = 6
 
     def get_queryset(self):
-        articles_queryset = (
-            Article.objects.filter(is_published=True)
-            .select_related("author", "category")
-        )
+        user = self.request.user
+        qs = Article.objects.select_related("author", "category")
 
-        search_query = self.request.GET.get("q", "").strip()
-        if search_query:
-            articles_queryset = articles_queryset.filter(
-                Q(title__icontains=search_query)
-                | Q(description__icontains=search_query)
-                | Q(body__icontains=search_query)
+        author_param = (self.request.GET.get("author") or "").strip().lower()
+        if author_param == "me" and user.is_authenticated:
+            qs = qs.filter(author_id=user.id)                       # свои (можно и неопубликованные)
+        elif author_param.isdigit():
+            author_id = int(author_param)
+            if user.is_authenticated and author_id == user.id:
+                qs = qs.filter(author_id=user.id)                   # свои
+            else:
+                qs = qs.filter(author_id=author_id, is_published=True)  # чужие только опубликованные
+        else:
+            qs = qs.filter(is_published=True)
+
+        q = (self.request.GET.get("q") or "").strip()
+        if q:
+            qs = qs.filter(
+                Q(title__icontains=q) | Q(description__icontains=q) | Q(body__icontains=q)
             )
 
-        category_id = self.request.GET.get("category", "").strip()
-        if category_id.isdigit():
-            articles_queryset = articles_queryset.filter(
-                category_id=category_id
-            )
+        cat = (self.request.GET.get("category") or "").strip()
+        if cat.isdigit():
+            qs = qs.filter(category_id=cat)
 
-        return articles_queryset.order_by("-published_at", "-pk")
+        return qs.order_by("-published_at", "-pk")
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["categories"] = Category.objects.all()
-        context["active_category"] = self.request.GET.get("category", "")
-        context["search_query"] = self.request.GET.get("q", "").strip()
-        return context
+        ctx = super().get_context_data(**kwargs)
+        user = self.request.user
+        author_param = (self.request.GET.get("author") or "").strip().lower()
 
+        is_my = author_param == "me" or (
+            author_param.isdigit() and user.is_authenticated and int(author_param) == user.id
+        )
+
+        ctx.update({
+            "categories": Category.objects.all(),
+            "active_category": (self.request.GET.get("category") or "").strip(),
+            "search_query": (self.request.GET.get("q") or "").strip(),
+            "is_my_articles": is_my,
+        })
+        return ctx
 
 class ArticleDetailView(DetailView):
     model = Article

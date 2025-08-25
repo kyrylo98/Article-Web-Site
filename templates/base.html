@@ -10,7 +10,7 @@
   <title>{% block title %}Aurora{% endblock %}</title>
 
   <!-- bump версию при изменении стилей -->
-  <link rel="stylesheet" href="{% static 'style.css' %}?v=9">
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=23">
 
   {% block meta %}{% endblock %}
   {% block extra_head %}{% endblock %}
@@ -18,66 +18,133 @@
 <body>
 <header class="site-header">
   <div class="container nav">
+    <!-- Back -->
+    <button id="navBack" class="btn-link" type="button" aria-label="Go back" rel="prev" hidden
+            data-fallback="{% url 'articles:index' %}">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span class="label">Back</span>
+    </button>
+
     <a class="brand" href="{% url 'articles:index' %}" aria-label="Aurora — home">Aurora</a>
 
     <nav class="nav-right" aria-label="Primary">
       <a href="{% url 'articles:index' %}">Articles</a>
 
-      <!-- Categories mega-menu -->
-      <details class="nav-account nav-cats">
-        <summary aria-haspopup="menu" aria-expanded="false">Categories</summary>
+      <!-- Categories trigger -->
+      <button class="nav-link" id="categoriesBtn"
+              type="button" aria-haspopup="true" aria-expanded="false"
+              aria-controls="categoriesPanel">
+        Categories
+        <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
 
-        <!-- Прокручиваемая панель -->
-        <div class="nav-dropdown nav-cats-panel" tabindex="-1" role="menu" aria-label="Categories">
-          <div class="cats-grid">
-            {% if nav_categories %}
-              {% for cat in nav_categories %}
-                <a class="cat-tile" role="menuitem"
-                   href="{% url 'articles:index' %}?category={{ cat.pk }}">
-                  <span class="cat-name">{{ cat.name }}</span>
-                  <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
-                </a>
-              {% endfor %}
-            {% else %}
-              <span class="muted">No categories yet</span>
-            {% endif %}
-          </div>
-
-          <div class="cats-actions">
-            <a class="btn-link" href="{% url 'categories:index' %}">All categories</a>
-            {% if request.user.is_staff %}
-              <a class="btn-link" href="{% url 'categories:create' %}">+ New category</a>
-            {% endif %}
-          </div>
+      <!-- Скрытый источник данных для ховер-панели категорий -->
+      <div class="nav-dropdown nav-cats-panel"
+           id="categoriesPanel"
+           role="menu"
+           aria-label="Categories"
+           hidden>
+        <div class="cats-grid">
+          {% if nav_categories %}
+            {% for cat in nav_categories %}
+              <a class="cat-tile" role="menuitem"
+                 href="{% url 'articles:index' %}?category={{ cat.pk }}">
+                <span class="cat-name">{{ cat.name }}</span>
+                <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
+              </a>
+            {% endfor %}
+          {% else %}
+            <span class="muted">No categories yet</span>
+          {% endif %}
         </div>
-      </details>
+
+        <div class="cats-actions">
+          <a class="btn-link" href="{% url 'categories:index' %}">All categories</a>
+          {% if request.user.is_staff %}
+            <a class="btn-link" href="{% url 'categories:create' %}">+ New category</a>
+          {% endif %}
+        </div>
+      </div>
 
       <a href="{% url 'home' %}">Home</a>
-
       {% if request.user.is_authenticated %}
         <a href="{% url 'articles:create' %}">Write</a>
-        <a class="btn ghost" href="{% url 'users:account' %}">My account</a>
+      {% endif %}
 
-        <form action="{% url 'account_logout' %}" method="post" class="nav-logout" style="display:inline">
-          {% csrf_token %}
-          <button class="nav-link-btn" type="submit">Logout</button>
-        </form>
-      {% else %}
-        <!-- Одна кнопка «Account» с меню логина -->
-        <details class="nav-account">
-          <summary aria-haspopup="menu" aria-expanded="false">Account</summary>
-          <div class="nav-dropdown" role="menu" aria-label="Account">
-            <div class="row">
-              <a class="btn-link" role="menuitem" href="{% url 'account_login' %}">Login</a>
-              <a class="btn-link" role="menuitem" href="{% url 'account_signup' %}">Register</a>
+      {# Аватар справа / гость — Login выпадашка #}
+      {% if request.user.is_authenticated %}
+        <div class="nav-item nav-avatar" id="navAvatar">
+          <div class="avatar-trigger">
+            <button class="avatar-btn" id="avatarBtn" type="button"
+                    aria-haspopup="true" aria-expanded="false" aria-controls="avatarPanel"
+                    title="{{ request.user.get_full_name|default:request.user.username }}">
+              {% if request.user.avatar %}
+                <img src="{{ request.user.avatar.url }}" alt="{{ request.user.username }}">
+              {% else %}
+                <img src="{% static 'img/avatar-default.png' %}" alt="{{ request.user.username }}">
+              {% endif %}
+            </button>
+            <span class="avatar-caption"
+                  title="{{ request.user.get_full_name|default:request.user.username }}">
+              {{ request.user.get_full_name|default:request.user.username|truncatechars:18 }}
+            </span>
+          </div>
+
+          <div class="nav-dropdown avatar-panel" id="avatarPanel" hidden>
+            <div class="menu-list">
+              <a class="menu-item" href="{% url 'articles:create' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16l10-10 2 2-10 10H6v-2z"/></svg>
+                Write
+              </a>
+              <a class="menu-item" href="{% url 'articles:index' %}?author=me">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v4H6zM6 10h12v10H6z"/></svg>
+                My articles
+              </a>
+              <a class="menu-item" href="{% url 'account_change_password' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-5V9a6 6 0 1 0-12 0v3H4v10h16V12h-2z"/></svg>
+                Change password
+              </a>
+              <form class="menu-item logout" action="{% url 'account_logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5v3H3v4h7v3zm9-12h-6V3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6v-2h6V5z"/></svg>
+                  Logout
+                </button>
+              </form>
             </div>
-            <div class="divider"></div>
-            <a class="btn-google" role="menuitem" href="{% provider_login_url 'google' %}">
-              <span class="g-badge" aria-hidden="true">G</span>
+          </div>
+        </div>
+      {% else %}
+        <div class="nav-item nav-login" id="navLogin">
+          <button class="nav-link" id="loginBtn" type="button"
+                  aria-haspopup="true" aria-expanded="false" aria-controls="loginPanel">
+            Login
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="nav-dropdown login-panel" id="loginPanel" hidden>
+            <div class="row">
+              <a class="btn-link" href="{% url 'account_login' %}">Login</a>
+              <a class="btn-link" href="{% url 'account_signup' %}">Register</a>
+            </div>
+            <div class="divider" style="height:1px;background:var(--border);margin:10px 0;"></div>
+            <a class="btn-google g-auth" href="{% provider_login_url 'google' %}">
+              <!-- оригинальная «G» -->
+              <svg class="google-g" viewBox="0 0 533.5 544" aria-hidden="true" width="20" height="20">
+                <path fill="#4285F4" d="M533.5 278.4c0-18.6-1.7-37-5.1-54.8H272v103.8h147.3c-6.4 34.6-26 64-55.4 83.6v69.3h89.6c52.4-48.3 79-119.5 79-201.9z"/>
+                <path fill="#34A853" d="M272 544c73.5 0 135.3-24.3 180.4-66.8l-89.6-69.3c-24.9 16.7-56.8 26.5-90.8 26.5-69.7 0-128.8-47-150-110.1H30.8v69.9C75.5 486 168.5 544 272 544z"/>
+                <path fill="#FBBC05" d="M122 324.3c-10.3-30.6-10.3-63.9 0-94.5V160H30.8c-41.4 82.5-41.4 181.5 0 264L122 324.3z"/>
+                <path fill="#EA4335" d="M272 106.5c40 0 76 13.8 104.3 40.9l78.2-78.2C407.1 24.5 345.4 0 272 0 168.5 0 75.5 58 30.8 160l91.2 69.9C143.2 153.8 202.3 106.5 272 106.5z"/>
+              </svg>
               <span>Sign in with Google</span>
             </a>
           </div>
-        </details>
+        </div>
       {% endif %}
     </nav>
   </div>
@@ -95,7 +162,7 @@
         <a class="footer-link" href="{% url 'articles:index' %}">Articles</a>
         <a class="footer-link" href="{% url 'articles:create' %}">Write</a>
         {% if request.user.is_authenticated %}
-          <a class="footer-link" href="{% url 'users:account' %}">My account</a>
+          <a class="footer-link" href="{% url 'articles:index' %}?author=me">My articles</a>
         {% else %}
           <a class="footer-link" href="{% url 'account_login' %}">Login</a>
         {% endif %}
@@ -124,44 +191,109 @@
 </footer>
 
 <script>
-/* Закрыть все <details> по клику вне/ESC + поддерживать aria-expanded */
+/* Back */
 (function () {
-  function closeOthers(except) {
-    document.querySelectorAll('details.nav-account[open]').forEach(d => {
-      if (d !== except) {
-        d.removeAttribute('open');
-        const s = d.querySelector('summary');
-        if (s) s.setAttribute('aria-expanded', 'false');
-      }
-    });
+  const btn = document.getElementById('navBack');
+  if (!btn) return;
+  const show = window.history.length > 1 || !!document.referrer;
+  if (show) btn.hidden = false;
+  btn.addEventListener('click', () => {
+    if (window.history.length > 1) { window.history.back(); return; }
+    window.location.href = btn.dataset.fallback || '/';
+  });
+})();
+
+/* Categories hover (нижняя панель по наведению) */
+(function () {
+  const trigger = document.getElementById('categoriesBtn');
+  const sourcePanel = document.getElementById('categoriesPanel');
+  if (!trigger || !sourcePanel) return;
+
+  let hoverPanel = document.getElementById('catsHoverPanel');
+  if (!hoverPanel) {
+    hoverPanel = document.createElement('div');
+    hoverPanel.id = 'catsHoverPanel';
+    const srcGrid = sourcePanel.querySelector('.cats-grid');
+    const srcActions = sourcePanel.querySelector('.cats-actions');
+    hoverPanel.innerHTML = `
+      <div class="cats-grid">${srcGrid ? srcGrid.innerHTML : ''}</div>
+      <div class="cats-actions">${srcActions ? srcActions.innerHTML : ''}</div>`;
+    document.body.appendChild(hoverPanel);
   }
 
-  document.addEventListener('click', (e) => {
-    document.querySelectorAll('details.nav-account').forEach(d => {
-      const summary = d.querySelector('summary');
-      if (!summary) return;
+  let hideTimer = null;
+  function place() {
+    const header = document.querySelector('.site-header');
+    const top = (header?.getBoundingClientRect().bottom || 66) + 8 + window.scrollY;
+    hoverPanel.style.top = top + 'px';
+  }
+  function open() { clearTimeout(hideTimer); place(); hoverPanel.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+  function close(d=120){ clearTimeout(hideTimer); hideTimer=setTimeout(()=>{ hoverPanel.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }, d); }
 
-      if (summary.contains(e.target)) {
-        const willOpen = !d.hasAttribute('open');
-        closeOthers(willOpen ? d : null);
-        requestAnimationFrame(() => {
-          summary.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        });
-      } else if (d.hasAttribute('open') && !d.contains(e.target)) {
-        d.removeAttribute('open');
-        summary.setAttribute('aria-expanded', 'false');
-      }
-    });
-  });
+  trigger.addEventListener('pointerenter', open);
+  hoverPanel.addEventListener('pointerenter', ()=>clearTimeout(hideTimer));
+  trigger.addEventListener('pointerleave', ()=>close());
+  hoverPanel.addEventListener('pointerleave', ()=>close());
+  document.addEventListener('click', e => { if (!hoverPanel.contains(e.target) && e.target!==trigger && !trigger.contains(e.target)) close(0); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(0); });
+  trigger.addEventListener('focus', open);
+  window.addEventListener('resize', ()=>{ if (hoverPanel.classList.contains('open')) place(); });
+  window.addEventListener('scroll', ()=>{ if (hoverPanel.classList.contains('open')) place(); }, {passive:true});
+})();
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('details.nav-account[open]').forEach(d => {
-        d.removeAttribute('open');
-        const s = d.querySelector('summary');
-        if (s) s.setAttribute('aria-expanded', 'false');
-      });
-    }
+/* Login dropdown (guest) */
+(function () {
+  const item = document.getElementById('navLogin');
+  if (!item) return;
+  const trigger = document.getElementById('loginBtn');
+  const panel = document.getElementById('loginPanel');
+  let t=null;
+  function open(){ clearTimeout(t); panel.hidden=false; item.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+  function close(d=120){ clearTimeout(t); t=setTimeout(()=>{ panel.hidden=true; item.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }, d); }
+  trigger.addEventListener('pointerenter', open);
+  item.addEventListener('pointerenter', open);
+  item.addEventListener('pointerleave', ()=>close());
+  trigger.addEventListener('click', (e)=>{ e.preventDefault(); panel.hidden ? open() : close(0); });
+  document.addEventListener('click', (e)=>{ if (!item.contains(e.target)) close(0); });
+  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') close(0); });
+})();
+
+/* Avatar dropdown (auth) */
+(function () {
+  const item = document.getElementById('navAvatar');
+  if (!item) return;
+  const trigger = document.getElementById('avatarBtn');
+  const panel = document.getElementById('avatarPanel');
+  let t=null;
+  function open(){ clearTimeout(t); panel.hidden=false; item.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+  function close(d=120){ clearTimeout(t); t=setTimeout(()=>{ panel.hidden=true; item.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }, d); }
+  trigger.addEventListener('pointerenter', open);
+  item.addEventListener('pointerenter', open);
+  item.addEventListener('pointerleave', ()=>close());
+  trigger.addEventListener('click', (e)=>{ e.preventDefault(); panel.hidden ? open() : close(0); });
+  document.addEventListener('click', (e)=>{ if (!item.contains(e.target)) close(0); });
+  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') close(0); });
+})();
+</script>
+
+<script>
+/* Кнопка Назад: показываем и переносим в <body>, чтобы висела снизу */
+(function () {
+  const btn = document.getElementById('navBack');
+  if (!btn) return;
+
+  // перенесём из шапки в body, чтобы шапка не влияла на позиционирование
+  document.body.appendChild(btn);
+
+  // хочешь справа — раскомментируй строку ниже
+  // btn.classList.add('back--right');
+
+  const hasHistory = window.history.length > 1 || !!document.referrer;
+  if (hasHistory) btn.hidden = false;
+
+  btn.addEventListener('click', () => {
+    if (window.history.length > 1) { window.history.back(); return; }
+    window.location.href = btn.dataset.fallback || '/';
   });
 })();
 </script>

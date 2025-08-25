@@ -1,59 +1,148 @@
 {% extends "base.html" %}
+{% block title %}{% if is_my_articles %}My articles{% else %}Articles{% endif %}{% endblock %}
 
 {% block content %}
 <section class="section container">
-  <h1 class="page-title">Articles</h1>
 
+  <!-- Заголовок + поиск + CTA -->
+  <div class="hero-gradient" style="margin-bottom:var(--g-3)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <h1 class="page-title m0">{% if is_my_articles %}My articles{% else %}Articles{% endif %}</h1>
+      {% if request.user.is_authenticated %}
+        <a class="cta" href="{% url 'articles:create' %}">Write</a>
+      {% endif %}
+    </div>
+
+    <!-- Поиск (GET + сохранение активных фильтров) -->
+    <form class="articles-search" method="get" action="{% url 'articles:index' %}">
+      <input type="search"
+             name="q"
+             placeholder="Search articles…"
+             value="{{ search_query }}">
+      {% if active_category %}
+        <input type="hidden" name="category" value="{{ active_category }}">
+      {% endif %}
+      {% if is_my_articles %}
+        <input type="hidden" name="author" value="me">
+      {% endif %}
+      <button class="btn-search" type="submit">Search</button>
+    </form>
+  </div>
+
+  <!-- Фильтры категорий -->
   <div class="chips">
-  <a class="chip {% if not active_category %}active{% endif %}"
-     href="{% url 'articles:index' %}">All</a>
-   {% for cat in categories %}
-    <a class="chip {% if active_category == cat.pk|stringformat:'s' %}active{% endif %}"
-       href="{% url 'articles:index' %}?category={{ cat.pk }}">
-      {{ cat.name }}
-    </a>
+    <a class="chip {% if not active_category %}active{% endif %}"
+       href="{% url 'articles:index' %}{% if is_my_articles %}?author=me{% endif %}">All</a>
+    {% for cat in categories %}
+      {% if is_my_articles %}
+        <a class="chip {% if active_category == cat.pk|stringformat:'s' %}active{% endif %}"
+           href="{% url 'articles:index' %}?author=me&category={{ cat.pk }}">{{ cat.name }}</a>
+      {% else %}
+        <a class="chip {% if active_category == cat.pk|stringformat:'s' %}active{% endif %}"
+           href="{% url 'articles:index' %}?category={{ cat.pk }}">{{ cat.name }}</a>
+      {% endif %}
     {% endfor %}
   </div>
 
-  <div class="card-grid">
-    {% for item in page_obj %}
-      <article class="card">
-        <a href="{% url 'articles:detail' item.pk %}">
-          <h3 class="m0">{{ item.title }}</h3>
-        </a>
-        <p class="muted m0">{{ item.description }}</p>
-         <p class="badge m0">
-          {% with pub=item.published_at|date:"M j, Y" %}
-            {{ pub }} • {{ item.reading_minutes }} min read
-          {% endwith %}
-         </p>
+  <!-- Компактная лента -->
+  {% if page_obj.object_list %}
+    <div class="feed feed--compact">
 
+      {% for item in page_obj %}
+        <article class="card card--post">
 
-        {% if request.user.is_authenticated %}
-          {% if request.user.is_staff or request.user.pk == item.author_id %}
-            <div class="actions mt">
-              <a class="cta" href="{% url 'articles:edit' item.pk %}">Edit</a>
-              <a class="cta secondary"
-                 href="{% url 'articles:delete' item.pk %}">Delete</a>
+          <!-- Верхняя строка -->
+          <div class="meta-top">
+            <span class="badge meta-type">Article</span>
+            <div class="meta-author">
+              {% if item.author.avatar %}
+                <img src="{{ item.author.avatar.url }}" alt="{{ item.author.username }}">
+              {% endif %}
+              <span class="name">{{ item.author.get_full_name|default:item.author.username }}</span>
+              <span class="dot">•</span>
+              <span class="ago">{{ item.published_at|timesince }} ago</span>
             </div>
-          {% endif %}
-        {% endif %}
-      </article>
-    {% empty %}
-      <p>No articles yet.</p>
-    {% endfor %}
-  </div>
+          </div>
 
-  {% include "includes/pagination.html" %}
+          <!-- Заголовок -->
+          <h2 class="post-title">
+            <a href="{% url 'articles:detail' item.pk %}">{{ item.title }}</a>
+          </h2>
+
+          <!-- Метаданные -->
+          <div class="meta-row">
+            {% if item.category %}
+              <a class="chip cat-pill"
+                 href="{% url 'articles:index' %}?category={{ item.category_id }}">{{ item.category.name }}</a>
+            {% endif %}
+            <span class="badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              {{ item.reading_minutes }} min
+            </span>
+            <span class="badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 12h10M12 7v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              {{ item.published_at|date:"M j, Y" }}
+            </span>
+          </div>
+
+          <!-- Картинка -->
+          {% if item.image %}
+            <a href="{% url 'articles:detail' item.pk %}">
+              <img class="post-thumb" src="{{ item.image.url }}" alt="">
+            </a>
+          {% endif %}
+
+          <!-- Превью -->
+          <p class="post-preview">
+            {% if item.description %}
+              {{ item.description }}
+            {% else %}
+              {{ item.body|striptags|truncatewords:40 }}
+            {% endif %}
+          </p>
+
+          <!-- Действия -->
+          <div class="post-actions">
+            <a class="cta secondary" href="{% url 'articles:detail' item.pk %}">Read more</a>
+            <div class="counters">
+              <span class="c">❤ 0</span>
+              <span class="c">💬 0</span>
+            </div>
+          </div>
+
+          <!-- Редактирование для автора/админа -->
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff or request.user.pk == item.author_id %}
+              <div class="owner-actions">
+                <a class="cta" href="{% url 'articles:edit' item.pk %}">Edit</a>
+                <a class="cta secondary" href="{% url 'articles:delete' item.pk %}">Delete</a>
+              </div>
+            {% endif %}
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+
+    {% include "includes/pagination.html" %}
+
+  {% else %}
+    <div class="card" style="margin-top:var(--g-3)">
+      {% if is_my_articles and request.user.is_authenticated %}
+        <p class="m0">You haven’t published anything yet.</p>
+        <div class="mt"><a class="cta" href="{% url 'articles:create' %}">Write your first article</a></div>
+      {% else %}
+        <p class="m0">No articles yet.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+<section class="section container hero-gradient" aria-labelledby="seo-h1">
+  <h2 id="seo-h1" class="page-title">Build faster with clear, practical articles</h2>
+  <p class="page-sub">Short, hands-on guides on programming, web development, and product design.</p>
 </section>
 {% endblock %}
-<section class="section container hero-gradient" aria-labelledby="seo-h1">
-  <h1 id="seo-h1" class="page-title">
-    Build faster with clear, practical articles
-  </h1>
-  <p class="page-sub">
-    Short, hands-on guides on programming, web development, and
-    product design. Real-world examples, checklists, and how-tos
-    to level up your projects.
-  </p>
-</section>

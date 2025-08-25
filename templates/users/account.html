@@ -4,16 +4,15 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <h1>My account</h1>
+    <h1 class="page-title">My account</h1>
 
-    <div style="display:flex;gap:24px;align-items:flex-start">
+    <div class="card" style="display:flex;gap:24px;align-items:flex-start">
       {% if request.user.avatar %}
         <img src="{{ request.user.avatar.url }}" alt="Avatar"
-             style="width:96px;height:96px;border-radius:50%;
-                    object-fit:cover;box-shadow:var(--shadow)">
+             style="width:96px;height:96px;border-radius:50%;object-fit:cover;box-shadow:var(--shadow)">
       {% endif %}
 
-      <ul style="list-style:none;margin:0;padding:0;line-height:1.9">
+      <ul class="m0" style="list-style:none;padding:0;line-height:1.9">
         <li><strong>Username:</strong> {{ request.user.username }}</li>
         <li><strong>Email:</strong> {{ request.user.email|default:"—" }}</li>
         <li><strong>Joined:</strong> {{ request.user.date_joined|date:"Y-m-d" }}</li>
@@ -22,14 +21,48 @@
       </ul>
     </div>
 
-    <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+    <!-- Actions -->
+    <div class="account-actions" style="margin-top:14px">
       {% if request.user.has_usable_password %}
         <a class="cta" href="{% url 'account_change_password' %}">Change password</a>
       {% else %}
         <a class="cta" href="{% url 'account_set_password' %}">Set a password</a>
       {% endif %}
+
+      <a class="cta secondary" href="{% url 'articles:index' %}?author={{ request.user.pk }}">
+        My articles
+      </a>
+
+      <form action="{% url 'account_logout' %}" method="post" style="display:inline">
         {% csrf_token %}
+        <button type="submit" class="cta danger">Logout</button>
+      </form>
     </div>
+
+    <!-- Мои статьи -->
+    {% if my_articles %}
+      <h2 class="mt">My articles</h2>
+      <div class="card-grid">
+        {% for a in my_articles %}
+          <article class="card">
+            <h3 class="m0" style="font-size:1.05rem">
+              <a href="{% url 'articles:detail' a.pk %}">{{ a.title }}</a>
+            </h3>
+            <p class="muted m0">Created: {{ a.created_at|date:"Y-m-d" }}</p>
+            <div class="account-actions" style="margin-top:10px">
+              <a class="btn-link" href="{% url 'articles:detail' a.pk %}">Open</a>
+              {% if request.user == a.author or request.user.is_staff %}
+                <a class="btn-link" href="{% url 'articles:update' a.pk %}">Edit</a>
+                <a class="btn-link" href="{% url 'articles:delete' a.pk %}">Delete</a>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted mt">You haven’t published anything yet.</p>
+      <a class="cta" href="{% url 'articles:create' %}">Write your first article</a>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

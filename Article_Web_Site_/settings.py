@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "dev-secret-change-me"
 DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".ngrok-free.app",]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -97,7 +97,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
-# ——— аутентификация / allauth ———
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
@@ -129,3 +128,10 @@ SOCIALACCOUNT_PROVIDERS = {
 
 ACCOUNT_LOGIN_METHODS = {"email", "username"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app"]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_SIGNUP_REDIRECT_URL = "/"
