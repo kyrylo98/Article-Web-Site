@@ -15,3 +15,4 @@ class UserAdmin(DjangoUserAdmin):
             "fields": ("avatar", "bio", "rating", "is_verified")
         }),
     )
+

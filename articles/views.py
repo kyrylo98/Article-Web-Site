@@ -118,3 +118,4 @@ class ArticleDeleteView(LoginRequiredMixin,
     model = Article
     template_name = "articles/confirm_delete.html"
     success_url = reverse_lazy("articles:index")
+

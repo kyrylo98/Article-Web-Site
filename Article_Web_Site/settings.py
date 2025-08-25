@@ -40,7 +40,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "Article_Web_Site_.urls"
+ROOT_URLCONF = "Article_Web_Site.urls"
 
 TEMPLATES = [
     {
@@ -59,8 +59,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "Article_Web_Site_.wsgi.application"
-ASGI_APPLICATION = "Article_Web_Site_.asgi.application"
+WSGI_APPLICATION = "Article_Web_Site.wsgi.application"
+ASGI_APPLICATION = "Article_Web_Site.asgi.application"
 
 DATABASES = {
     "default": {
@@ -135,3 +135,5 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
+
+

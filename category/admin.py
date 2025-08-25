@@ -7,3 +7,4 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "created_at")
     search_fields = ("name",)
     ordering = ("name",)
+

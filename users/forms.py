@@ -16,3 +16,4 @@ class ProfileUpdateForm(forms.ModelForm):
                 attrs={"accept": "image/*"}
             ),
         }
+

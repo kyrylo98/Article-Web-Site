@@ -129,3 +129,4 @@ class Command(BaseCommand):
             created += 1
 
         self.stdout.write(self.style.SUCCESS(f"Created {created} articles."))
+

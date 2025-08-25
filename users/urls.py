@@ -7,3 +7,4 @@ app_name = "users"
 urlpatterns = [
     path("account/", account_view, name="account"),
 ]
+

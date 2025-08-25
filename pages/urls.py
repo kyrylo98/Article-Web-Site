@@ -19,3 +19,4 @@ urlpatterns = [
     path("sitemap/", TemplateView.as_view(
         template_name="pages/sitemap.html"), name="sitemap"),
 ]
+

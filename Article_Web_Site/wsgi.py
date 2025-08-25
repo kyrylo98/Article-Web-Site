@@ -1,5 +1,5 @@
 """
-WSGI config for Article_Web_Site_ project.
+WSGI config for Article_Web_Site project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,9 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE",
-                      "Article_Web_Site_.settings")
+                      "Article_Web_Site.settings")
 application = get_wsgi_application()
+
+
+
 

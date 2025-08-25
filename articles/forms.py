@@ -19,3 +19,4 @@ class ArticleForm(forms.ModelForm):
             }),
             "category": forms.Select(attrs={"class": "select"}),
         }
+

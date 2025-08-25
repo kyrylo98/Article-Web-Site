@@ -48,3 +48,4 @@ class Article(models.Model):
     def reading_minutes(self) -> int:
         words = len(self.body.split())
         return max(1, words // 200)
+

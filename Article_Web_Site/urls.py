@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from Article_Web_Site_.views import home_view
+from Article_Web_Site.views import home_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -49,3 +49,5 @@ if settings.DEBUG:
                           document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_ROOT)
+
+

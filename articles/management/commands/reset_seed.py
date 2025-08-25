@@ -166,3 +166,4 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f"Done! Categories: {Category.objects.count()}, Articles: {Article.objects.count()}"
         ))
+
