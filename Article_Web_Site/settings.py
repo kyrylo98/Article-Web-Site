@@ -1,4 +1,4 @@
-from pathlib import Path`r`nimport os
+from pathlib import Path
 import os
 
 from dotenv import load_dotenv
@@ -7,9 +7,13 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Read secrets and environment config
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-unsafe-secret-change-me")
-DEBUG = os.environ.get("DEBUG", "1") in ("1","true","True")
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+DEBUG = os.environ.get("DEBUG", "1") in ("1", "true", "True")
+ALLOWED_HOSTS = [
+    h.strip() for h in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if h.strip()
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -19,10 +23,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+
     "users",
     "articles",
     "category",
     "pages",
+
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -34,8 +40,8 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -48,12 +54,12 @@ TEMPLATES = [
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
-            "context_processors": [
+                "context_processors": [
                 "django.template.context_processors.debug",
-                "django.template.context_processors.request",  # allauth
+                "django.template.context_processors.request",  # required by allauth
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "category.context_processors.nav_categories"
+                "category.context_processors.nav_categories",
             ],
         },
     },
@@ -70,16 +76,10 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": ("django.contrib.auth.password_validation."
-                 "UserAttributeSimilarityValidator")
-    },
-    {"NAME": ("django.contrib.auth.password_validation."
-              "MinimumLengthValidator")},
-    {"NAME": ("django.contrib.auth.password_validation."
-              "CommonPasswordValidator")},
-    {"NAME": ("django.contrib.auth.password_validation."
-              "NumericPasswordValidator")},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 LANGUAGE_CODE = "en-us"
@@ -108,10 +108,10 @@ LOGIN_URL = "account_login"
 LOGIN_REDIRECT_URL = "users:account"
 LOGOUT_REDIRECT_URL = "articles:index"
 
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"     # локально без подтверждения
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+# allauth (no deprecated settings)
+ACCOUNT_LOGIN_METHODS = {"email", "username"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+ACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -126,16 +126,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-ACCOUNT_LOGIN_METHODS = {"email", "username"}
-ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
-
 CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app"]
-
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
-
-
-
-

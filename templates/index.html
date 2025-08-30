@@ -7,23 +7,21 @@ Aurora — Practical guides for developers & makers
 
 {% block meta %}
   {{ block.super }}
+  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/" />
   <meta name="description"
-        content="Aurora publishes concise articles on programming,
-                 web development, UI/UX and product thinking.
-                 Actionable guides, patterns and checklists." />
-  <link rel="canonical"
-        href="{{ request.scheme }}://{{ request.get_host }}/" />
-  <meta property="og:title"
-        content="Aurora — Practical guides for developers & makers" />
-  <meta property="og:description"
-        content="Short, trustworthy articles you can apply in minutes." />
-  <meta property="og:image" content="{% static "img/hero1.jpg" %}" />
-  <meta name="twitter:title"
-        content="Aurora — Practical guides for developers & makers" />
-  <meta name="twitter:description"
-        content="Short, trustworthy articles you can apply in minutes." />
+        content="Concise, actionable articles on Python/Django, APIs, frontend UI/UX and product craft. Practical steps, patterns and checklists." />
 
-  {# WebSite + SearchAction #}
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Aurora — Practical guides for developers & makers" />
+  <meta property="og:description" content="Short, trustworthy articles you can apply in minutes." />
+  <meta property="og:image" content="{% static 'img/hero1.jpg' %}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Aurora — Practical guides for developers & makers" />
+  <meta name="twitter:description" content="Short, trustworthy articles you can apply in minutes." />
+  <meta name="twitter:image" content="{% static 'img/hero1.jpg' %}" />
+
+  <!-- Structured data: WebSite + SearchAction -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -32,14 +30,30 @@ Aurora — Practical guides for developers & makers
     "url": "{{ request.scheme }}://{{ request.get_host }}/",
     "potentialAction": {
       "@type": "SearchAction",
-      "target":
-        "{{ request.scheme }}://{{ request.get_host }}/articles/?q={query}",
+      "target": "{{ request.scheme }}://{{ request.get_host }}/articles/?q={query}",
       "query-input": "required name=query"
     }
   }
   </script>
 
-  {# FAQPage #}
+  <!-- Structured data: Organization (logo/contact help rankings) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Aurora",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-512.png' %}",
+    "contactPoint": [{
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "support@example.com",
+      "availableLanguage": ["en"]
+    }]
+  }
+  </script>
+
+  <!-- Structured data: FAQPage (same Q&A you had) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -50,9 +64,7 @@ Aurora — Practical guides for developers & makers
         "name": "What topics does Aurora cover?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Programming, Django/Python backends, APIs,
-                   frontend UI/UX, product design and practical
-                   checklists for makers."
+          "text": "Programming, Django/Python backends, APIs, frontend UI/UX, product design and practical checklists for makers."
         }
       },
       {
@@ -60,8 +72,7 @@ Aurora — Practical guides for developers & makers
         "name": "Are articles beginner-friendly?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. Posts are short, actionable and include steps,
-                   code snippets and links for deeper reading."
+          "text": "Yes. Posts are short, actionable and include steps, code snippets and links for deeper reading."
         }
       },
       {
@@ -69,8 +80,7 @@ Aurora — Practical guides for developers & makers
         "name": "Can I publish on Aurora?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Create an account, open the Write page and submit a
-                   concise, useful draft."
+          "text": "Create an account, open the Write page and submit a concise, useful draft."
         }
       }
     ]
@@ -81,103 +91,114 @@ Aurora — Practical guides for developers & makers
 {% block content %}
 <section class="section container">
 
-  {# ---------- HERO ---------- #}
-  <div class="card--glass hero-gradient"
-       style="position:relative;overflow:hidden;
-              background-image:url({% static 'img/hero.jpg' %});
-              background-size:cover;background-position:center;
-              min-height:260px;border-radius:18px;">
-    <div style="position:absolute;inset:0;
-                background:linear-gradient(90deg,
-                rgba(11,16,32,.92), rgba(11,16,32,.58));">
-    </div>
+  <!-- HERO (image card; text only over subtle darkening; no buttons here) -->
+  <div class="card--glass hero-gradient" style="position:relative;overflow:hidden;border-radius:18px;min-height:260px">
+    <img
+      src="{% static 'img/hero.jpg' %}"
+      alt="Developer reading a concise guide"
+      width="1600" height="900" loading="eager" fetchpriority="high"
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.78) saturate(1.02)" />
+    <div aria-hidden="true"
+         style="position:absolute;inset:0;background:
+           linear-gradient(180deg, rgba(11,16,32,.15), rgba(11,16,32,.38));"></div>
 
-    <div style="position:relative;max-width:720px;padding:28px 24px;">
+    <div style="position:relative;max-width:820px;padding:clamp(18px,3.2vw,28px)">
       <p class="kicker">Modern • Readable • Practical</p>
-      <h1 class="page-title m0">
-        Learn faster with concise articles
-      </h1>
-      <p class="muted" style="max-width:64ch">
-        Aurora is a content hub for developers and makers. We publish
-        compact, trustworthy guides on Python &amp; Django, APIs,
-        frontend craft, UI/UX and product thinking. No fluff — only
-        steps, patterns and checklists that save time.
+      <h1 class="page-title m0">Learn faster with concise articles</h1>
+      <p class="muted" style="max-width:68ch">
+        Aurora publishes compact, trustworthy guides on Python &amp; Django, APIs, frontend craft,
+        UI/UX and product thinking. No fluff — only steps, patterns and checklists that save time.
       </p>
+    </div>
+  </div>
 
-      <div class="actions">
-        {% if request.user.is_authenticated %}
-          <a class="cta" href="{% url 'articles:create' %}">
-            Write article
-          </a>
-        {% else %}
-          {# гостям ведём на регистрацию, но ниже дадим явные кнопки входа #}
-          <a class="cta" href="{% url 'account_signup' %}">
-            Write article
-          </a>
-        {% endif %}
-        <a class="cta secondary" href="{% url 'articles:index' %}">
-          Browse articles
-        </a>
-      </div>
+  <!-- CTA STRIP (separate from the image so nothing is covered) -->
+  <div class="card" style="margin-top:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <!-- Accessible search (GET -> /articles/?q=...) -->
+    <form action="{% url 'articles:index' %}" method="get" role="search"
+          class="articles-search" style="flex:1 1 420px">
+      <label for="q" class="visually-hidden"
+             style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">Search articles</label>
+      <input id="q" name="q" type="search" placeholder="Search articles, e.g. “Django forms”" />
+      <button class="btn-search" type="submit">Search</button>
+    </form>
 
-      {# три кнопки под "Write article" только для гостей #}
-      {% if not request.user.is_authenticated %}
-        <div class="auth-cta" style="margin-top:12px;display:flex;
-                                      gap:10px;flex-wrap:wrap">
-          <a class="btn ghost" href="{% url 'account_login' %}">
-            Login
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      {% if request.user.is_authenticated %}
+        <a class="cta" href="{% url 'articles:create' %}">Write article</a>
+      {% else %}
+        <a class="cta" href="{% url 'account_signup' %}">Start writing</a>
+        <a class="cta secondary" href="{% url 'account_login' %}">Login</a>
+      {% endif %}
+      <a class="cta secondary" href="{% url 'articles:index' %}">Browse all</a>
+    </div>
+  </div>
+
+  <!-- WHY AURORA (trust + value props) -->
+  <div class="card" style="margin-top:12px">
+    <h2 class="m0">Why Aurora</h2>
+    <div class="card-grid" style="--min:240px;margin-top:var(--g-2)">
+      <article class="card">
+        <h3 class="m0">Actionable first</h3>
+        <p class="m0">Every post ships with steps, code and checklists. Learn → apply in minutes.</p>
+      </article>
+      <article class="card">
+        <h3 class="m0">Clean & accessible</h3>
+        <p class="m0">Semantic HTML, keyboard-friendly UI and careful contrast for better UX.</p>
+      </article>
+      <article class="card">
+        <h3 class="m0">Fast by default</h3>
+        <p class="m0">Lean CSS, compressed media and internal linking that helps users and crawlers.</p>
+      </article>
+    </div>
+  </div>
+
+  <!-- FEATURED CATEGORIES (internal links boost) -->
+  <div class="card" style="margin-top:12px">
+    <h2 class="m0">Popular categories</h2>
+    <div class="chips" style="margin-top:12px">
+      {% if nav_categories %}
+        {% for cat in nav_categories|slice:":10" %}
+          <a class="chip" href="{% url 'articles:index' %}?category={{ cat.pk }}">
+            {{ cat.name }}
           </a>
-          <a class="btn ghost" href="{% url 'account_signup' %}">
-            Register
-          </a>
-          <a class="btn ghost" href="{% provider_login_url 'google' %}">
-            <span class="g-badge"
-                  style="display:inline-flex;align-items:center;
-                         justify-content:center;width:20px;height:20px;
-                         border-radius:50%;background:#fff;color:#4285f4;
-                         font-weight:700;margin-right:6px">G</span>
-            Sign in with Google
-          </a>
-        </div>
+        {% endfor %}
+        <a class="chip" href="{% url 'categories:index' %}">All categories →</a>
+      {% else %}
+        <span class="muted">No categories yet</span>
       {% endif %}
     </div>
   </div>
 
-  {# ---------- SEO body copy ---------- #}
-  <div class="card" style="padding:22px">
+  <!-- EDITORIAL PITCH (SEO body copy with headings/lists) -->
+  <article class="card" style="margin-top:12px;padding:22px">
     <h2 class="m0">What you’ll find on Aurora</h2>
-    <p>
-      • <strong>Programming &amp; backend:</strong> Python patterns,
-      Django tips, REST/GraphQL APIs, auth, testing, deployment.<br>
-      • <strong>Frontend &amp; UI:</strong> semantic HTML, accessible
-      components, layout systems, performance budgets.<br>
-      • <strong>Product &amp; UX:</strong> research shortcuts, content
-      design, onboarding checklists, better release notes.
-    </p>
-
-    <h3 class="m0">Why it ranks and reads well</h3>
     <ul>
-      <li>Clean semantic HTML and internal linking.</li>
-      <li>Unique meta descriptions and social cards.</li>
-      <li>Structured data (WebSite, FAQ) via JSON-LD.</li>
-      <li>Fast dark UI with minimal CSS and compressed media.</li>
-      <li>Short paragraphs and scannable lists.</li>
+      <li><strong>Programming &amp; backend:</strong> Python patterns, Django tips, REST/GraphQL APIs, auth, testing, deployment.</li>
+      <li><strong>Frontend &amp; UI:</strong> semantic HTML, accessible components, layout systems, performance budgets.</li>
+      <li><strong>Product &amp; UX:</strong> research shortcuts, content design, onboarding checklists, better release notes.</li>
     </ul>
 
-    <h3 class="m0">Publishing principles</h3>
-    <p>
-      Every post is edited for clarity and usefulness. We prefer examples
-      over theory and checklists over long prose. If a tutorial needs
-      more than 7–10 minutes, we split it into parts.
-    </p>
+    <h3 class="m0">Our publishing principles</h3>
+    <ul>
+      <li>Short, focused posts that solve a real task.</li>
+      <li>Examples over theory, checklists over long prose.</li>
+      <li>Split anything that takes more than 10 minutes to read.</li>
+    </ul>
 
     <h3 class="m0">Natural keyword themes</h3>
     <p class="muted" style="max-width:70ch">
-      django best practices, python snippets, web performance checklist,
-      accessible components, product design tips, release notes guide,
-      README patterns, content design guidelines.
+      django best practices, python snippets, web performance checklist, accessible components, product design tips,
+      release notes guide, README patterns, content design guidelines.
     </p>
-  </div>
+
+    <!-- Deep internal links help crawlers discover detail pages -->
+    <p class="m0">
+      Start with the <a href="{% url 'articles:index' %}">latest articles</a>,
+      browse by <a href="{% url 'categories:index' %}">category</a>,
+      or <a href="{% url 'articles:index' %}?q=django">search for Django tips</a>.
+    </p>
+  </article>
 
 </section>
 {% endblock %}

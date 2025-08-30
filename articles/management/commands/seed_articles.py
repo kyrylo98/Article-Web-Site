@@ -117,8 +117,7 @@ class Command(BaseCommand):
                 author=author,
                 is_published=random.choice([True, False, True]),
             )
-
-            # Если у модели есть поле published_at — заполним мягко.
+# comment removed (non-English)
             if hasattr(article, "published_at"):
                 shift = random.randint(-30, 0)
                 article.published_at = timezone.now() + timezone.timedelta(
@@ -129,4 +128,5 @@ class Command(BaseCommand):
             created += 1
 
         self.stdout.write(self.style.SUCCESS(f"Created {created} articles."))
+
 

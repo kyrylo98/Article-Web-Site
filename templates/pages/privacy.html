@@ -1,12 +1,126 @@
 {% extends "base.html" %}
+
 {% block title %}Privacy Policy — Aurora{% endblock %}
+
+{% block meta %}
+  {{ block.super }}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+  <meta name="description"
+        content="Learn what data Aurora collects, how we use it, legal bases, retention, your rights and how to contact us." />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Privacy Policy — Aurora" />
+  <meta property="og:description"
+        content="What we collect, how we use it, your rights and contact." />
+  <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Privacy Policy — Aurora" />
+  <meta name="twitter:description"
+        content="What we collect, how we use it, your rights and contact." />
+
+  <!-- Structured data: PrivacyPolicy + Breadcrumbs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "PrivacyPolicy",
+    "name": "Privacy Policy",
+    "url": "{{ request.build_absolute_uri }}",
+    "dateModified": "{% now 'c' %}",
+    "publisher": { "@type": "Organization", "name": "Aurora" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      { "@type":"ListItem","position":1,"name":"Home",
+        "item":"{{ request.scheme }}://{{ request.get_host }}/" },
+      { "@type":"ListItem","position":2,"name":"Privacy Policy",
+        "item":"{{ request.build_absolute_uri }}" }
+    ]
+  }
+  </script>
+{% endblock %}
+
 {% block content %}
 <section class="section container prose">
   <h1 class="page-title">Privacy Policy</h1>
+
+  <!-- In-page TOC -->
+  <nav class="chips" aria-label="Sections">
+    <a class="chip" href="#data-we-collect">Data we collect</a>
+    <a class="chip" href="#how-we-use-data">How we use data</a>
+    <a class="chip" href="#legal-bases">Legal bases</a>
+    <a class="chip" href="#retention">Retention</a>
+    <a class="chip" href="#sharing">Sharing</a>
+    <a class="chip" href="#your-rights">Your rights</a>
+    <a class="chip" href="#children">Children</a>
+    <a class="chip" href="#contact">Contact</a>
+  </nav>
+
+  <h2 id="data-we-collect">Data we collect</h2>
+  <ul>
+    <li><strong>Account</strong>: email, username, password hash; optional profile data (avatar, name).</li>
+    <li><strong>Content</strong>: articles, comments, media you upload.</li>
+    <li><strong>Usage</strong>: basic logs, device/browser info, approximate location from IP for security.</li>
+    <li><strong>Cookies</strong>: see our <a href="{% url 'pages:cookies' %}">Cookie Policy</a>.</li>
+  </ul>
+
+  <h2 id="how-we-use-data">How we use data</h2>
+  <ul>
+    <li>Provide and secure the service (auth, sessions, CSRF, abuse prevention).</li>
+    <li>Operate features such as writing, reading, search and personalization.</li>
+    <li>Analyze aggregate usage to improve performance and content quality.</li>
+    <li>Communicate about critical updates; optional newsletters with consent.</li>
+  </ul>
+
+  <h2 id="legal-bases">Legal bases (GDPR)</h2>
+  <ul>
+    <li><em>Contract</em>: to provide the service you requested.</li>
+    <li><em>Legitimate interests</em>: security, diagnostics, product improvement.</li>
+    <li><em>Consent</em>: optional analytics or marketing where required.</li>
+    <li><em>Legal obligation</em>: compliance with applicable law.</li>
+  </ul>
+
+  <h2 id="retention">Retention</h2>
   <p>
-    We collect only the data required to run the service (account,
-    content and basic analytics). You can request data export or
-    deletion at any time by contacting support.
+    We keep account and content data while your account is active.
+    Logs and analytics are retained for the shortest time needed for
+    operations and security, typically 30–180 days.
   </p>
+
+  <h2 id="sharing">Sharing</h2>
+  <p>
+    We do not sell personal data. Limited data may be shared with service providers
+    (hosting, storage, analytics) under data-processing agreements.
+  </p>
+
+  <h2 id="your-rights">Your rights</h2>
+  <ul>
+    <li>Access, correction, deletion and portability of your data.</li>
+    <li>Objection or restriction in certain cases.</li>
+    <li>Withdraw consent at any time where processing is based on consent.</li>
+    <li>File a complaint with your local supervisory authority.</li>
+  </ul>
+  <p>
+    To request export or deletion, email <a href="mailto:privacy@example.com">privacy@example.com</a>.
+  </p>
+
+  <h2 id="children">Children’s privacy</h2>
+  <p>
+    The service is not directed to children under 13 (or the minimum age required in your jurisdiction).
+  </p>
+
+  <h2 id="contact">Contact</h2>
+  <p>
+    Email <a href="mailto:privacy@example.com">privacy@example.com</a>.
+    Postal inquiries available upon request.
+  </p>
+
+  <p class="muted">Last updated: {% now "F j, Y" %}</p>
 </section>
 {% endblock %}

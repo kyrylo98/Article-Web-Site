@@ -49,3 +49,4 @@ class Article(models.Model):
         words = len(self.body.split())
         return max(1, words // 200)
 
+

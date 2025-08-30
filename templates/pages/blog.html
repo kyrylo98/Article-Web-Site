@@ -1,10 +1,154 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Blog — Aurora{% endblock %}
+
+{% block meta %}
+  {{ block.super }}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+  <meta name="description"
+        content="Aurora blog: platform news, UI updates, writing tips and curation notes for concise, trustworthy content." />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog — Aurora" />
+  <meta property="og:description"
+        content="Platform news, UI updates, writing tips and curation notes." />
+  <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+  <meta property="og:image" content="{% static 'img/hero1.jpg' %}" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blog — Aurora" />
+  <meta name="twitter:description"
+        content="Platform news, UI updates, writing tips and curation notes." />
+  <meta name="twitter:image" content="{% static 'img/hero1.jpg' %}" />
+
+  <!-- Structured data: Blog -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Aurora Blog",
+    "url": "{{ request.build_absolute_uri }}",
+    "description": "Aurora blog with product updates, UI changes and writing tips.",
+    "image": "{% static 'img/hero1.jpg' %}",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Aurora"
+    }
+  }
+  </script>
+
+  <!-- Structured data: Breadcrumbs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ request.scheme }}://{{ request.get_host }}/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+    ]
+  }
+  </script>
+{% endblock %}
+
 {% block content %}
-<section class="section container prose">
-  <h1 class="page-title">Blog</h1>
-  <p>
-    News about the platform, UI updates, tips for writing and curation.
-  </p>
+<section class="section container">
+
+  <!-- Hero: responsive banner with overlay -->
+  <div class="card--glass hero-gradient"
+       style="position:relative;overflow:hidden;min-height:220px;border-radius:18px">
+    <img
+      src="{% static 'img/hero.jpg' %}"
+      alt="Aurora blog — platform news and writing tips"
+      width="1600" height="900" loading="eager" fetchpriority="high"
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+    <div aria-hidden="true"
+         style="position:absolute;inset:0;background:linear-gradient(90deg, rgba(11,16,32,.92), rgba(11,16,32,.58));"></div>
+
+    <div style="position:relative;max-width:760px;padding:22px 18px 26px">
+      <h1 class="page-title m0" style="color:#fff">Blog</h1>
+      <p class="muted" style="max-width:70ch;color:#e6edf3">
+        Platform news, UI updates, roadmaps and short tips for writing
+        clear, actionable posts.
+      </p>
+    </div>
+  </div>
+
+  <!-- Posts grid: collapses to a single column on small screens -->
+  {% if posts %}
+    <div class="card-grid" style="--min:260px;margin-top:var(--g-3)">
+      {% for post in posts %}
+        <article class="card" itemscope itemtype="https://schema.org/BlogPosting">
+          <h2 class="m0" itemprop="headline">
+            <a href="{{ post.get_absolute_url }}" itemprop="url">{{ post.title }}</a>
+          </h2>
+          <p class="muted" style="margin:.35rem 0 .75rem">
+            <time datetime="{{ post.published_at|date:'c' }}" itemprop="datePublished">
+              {{ post.published_at|date:"M j, Y" }}
+            </time>
+            {% if post.author %}
+              · <span itemprop="author">{{ post.author.get_full_name|default:post.author }}</span>
+            {% endif %}
+          </p>
+          <p itemprop="description">
+            {{ post.excerpt|default:post.body|striptags|truncatechars:180 }}
+          </p>
+        </article>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination (shown only if page_obj available) -->
+    {% if page_obj %}
+      <nav class="pagination" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" rel="prev">Prev</a>
+        {% else %}
+          <span aria-disabled="true">Prev</span>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" rel="next">Next</a>
+        {% else %}
+          <span aria-disabled="true">Next</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <!-- Fallback: no posts yet -->
+    <div class="card" style="margin-top:var(--g-3);padding:var(--g-3)">
+      <p class="m0 muted">
+        No blog posts yet. In the meantime, browse our
+        <a href="{% url 'articles:index' %}">articles</a>.
+      </p>
+    </div>
+  {% endif %}
+
+  <!-- Extra SEO copy keeps readable on 320px -->
+  <article class="card prose" style="margin-top:var(--g-3);padding:var(--g-3)">
+    <h2 class="m0">What we cover</h2>
+    <ul>
+      <li>Release notes and UI/UX improvements across the site.</li>
+      <li>Editorial guidelines and tips for concise writing.</li>
+      <li>Roadmaps, changelogs and curation policies.</li>
+    </ul>
+    <p class="muted" style="max-width:70ch">
+      Keywords: platform updates, changelog, writing tips, editorial guidelines, Aurora roadmap.
+    </p>
+  </article>
+
 </section>
 {% endblock %}

@@ -30,3 +30,4 @@ class ArticleUrlTests(SimpleTestCase):
         url = reverse("articles:delete", args=[1])
         self.assertEqual(resolve(url).func.view_class, ArticleDeleteView)
 
+

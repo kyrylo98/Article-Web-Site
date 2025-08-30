@@ -9,145 +9,156 @@
         content="Concise, practical articles on programming, web development and product design.">
   <title>{% block title %}Aurora{% endblock %}</title>
 
-  <!-- bump версию при изменении стилей -->
-  <link rel="stylesheet" href="{% static 'style.css' %}?v=23">
+  <!-- bump this version when styles change -->
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=24">
 
   {% block meta %}{% endblock %}
   {% block extra_head %}{% endblock %}
 </head>
 <body>
 <header class="site-header">
-  <div class="container nav">
-    <!-- Back -->
+  <nav class="nav container" aria-label="Site">
+    <!-- floating back button (initially hidden; moved to <body> by JS) -->
     <button id="navBack" class="btn-link" type="button" aria-label="Go back" rel="prev" hidden
             data-fallback="{% url 'articles:index' %}">
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
       <span class="label">Back</span>
     </button>
 
+    <!-- brand -->
     <a class="brand" href="{% url 'articles:index' %}" aria-label="Aurora — home">Aurora</a>
 
-    <nav class="nav-right" aria-label="Primary">
-      <a href="{% url 'articles:index' %}">Articles</a>
+    <!-- burger -->
+    <button id="navToggle" class="nav-toggle" aria-expanded="false"
+            aria-controls="primaryNav" aria-label="Toggle menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
 
-      <!-- Categories trigger -->
-      <button class="nav-link" id="categoriesBtn"
-              type="button" aria-haspopup="true" aria-expanded="false"
-              aria-controls="categoriesPanel">
-        Categories
-        <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+    <!-- primary navigation -->
+    <div class="nav-right">
+      <ul id="primaryNav" class="nav-list" role="menu">
+        <li class="nav-item"><a class="nav-link" href="{% url 'articles:index' %}" role="menuitem">Articles</a></li>
 
-      <!-- Скрытый источник данных для ховер-панели категорий -->
-      <div class="nav-dropdown nav-cats-panel"
-           id="categoriesPanel"
-           role="menu"
-           aria-label="Categories"
-           hidden>
-        <div class="cats-grid">
-          {% if nav_categories %}
-            {% for cat in nav_categories %}
-              <a class="cat-tile" role="menuitem"
-                 href="{% url 'articles:index' %}?category={{ cat.pk }}">
-                <span class="cat-name">{{ cat.name }}</span>
-                <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
-              </a>
-            {% endfor %}
-          {% else %}
-            <span class="muted">No categories yet</span>
-          {% endif %}
-        </div>
-
-        <div class="cats-actions">
-          <a class="btn-link" href="{% url 'categories:index' %}">All categories</a>
-          {% if request.user.is_staff %}
-            <a class="btn-link" href="{% url 'categories:create' %}">+ New category</a>
-          {% endif %}
-        </div>
-      </div>
-
-      <a href="{% url 'home' %}">Home</a>
-      {% if request.user.is_authenticated %}
-        <a href="{% url 'articles:create' %}">Write</a>
-      {% endif %}
-
-      {# Аватар справа / гость — Login выпадашка #}
-      {% if request.user.is_authenticated %}
-        <div class="nav-item nav-avatar" id="navAvatar">
-          <div class="avatar-trigger">
-            <button class="avatar-btn" id="avatarBtn" type="button"
-                    aria-haspopup="true" aria-expanded="false" aria-controls="avatarPanel"
-                    title="{{ request.user.get_full_name|default:request.user.username }}">
-              {% if request.user.avatar %}
-                <img src="{{ request.user.avatar.url }}" alt="{{ request.user.username }}">
-              {% else %}
-                <img src="{% static 'img/avatar-default.png' %}" alt="{{ request.user.username }}">
-              {% endif %}
-            </button>
-            <span class="avatar-caption"
-                  title="{{ request.user.get_full_name|default:request.user.username }}">
-              {{ request.user.get_full_name|default:request.user.username|truncatechars:18 }}
-            </span>
-          </div>
-
-          <div class="nav-dropdown avatar-panel" id="avatarPanel" hidden>
-            <div class="menu-list">
-              <a class="menu-item" href="{% url 'articles:create' %}">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16l10-10 2 2-10 10H6v-2z"/></svg>
-                Write
-              </a>
-              <a class="menu-item" href="{% url 'articles:index' %}?author=me">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v4H6zM6 10h12v10H6z"/></svg>
-                My articles
-              </a>
-              <a class="menu-item" href="{% url 'account_change_password' %}">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-5V9a6 6 0 1 0-12 0v3H4v10h16V12h-2z"/></svg>
-                Change password
-              </a>
-              <form class="menu-item logout" action="{% url 'account_logout' %}" method="post">
-                {% csrf_token %}
-                <button type="submit">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5v3H3v4h7v3zm9-12h-6V3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6v-2h6V5z"/></svg>
-                  Logout
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      {% else %}
-        <div class="nav-item nav-login" id="navLogin">
-          <button class="nav-link" id="loginBtn" type="button"
-                  aria-haspopup="true" aria-expanded="false" aria-controls="loginPanel">
-            Login
+        <!-- categories: trigger + hidden source panel (for desktop hover panel) -->
+        <li class="nav-item nav-categories">
+          <button class="nav-link" id="categoriesBtn" type="button"
+                  aria-haspopup="true" aria-expanded="false" aria-controls="categoriesPanel">
+            Categories
             <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
-          <div class="nav-dropdown login-panel" id="loginPanel" hidden>
-            <div class="row">
-              <a class="btn-link" href="{% url 'account_login' %}">Login</a>
-              <a class="btn-link" href="{% url 'account_signup' %}">Register</a>
+
+          <!-- hidden HTML source for the desktop hover panel -->
+          <div class="nav-dropdown nav-cats-panel"
+               id="categoriesPanel"
+               role="menu"
+               aria-label="Categories"
+               hidden>
+            <div class="cats-grid">
+              {% if nav_categories %}
+                {% for cat in nav_categories %}
+                  <a class="cat-tile" role="menuitem"
+                     href="{% url 'articles:index' %}?category={{ cat.pk }}">
+                    <span class="cat-name">{{ cat.name }}</span>
+                    <span class="cat-count">{{ cat.article_count|default:"0" }}</span>
+                  </a>
+                {% endfor %}
+              {% else %}
+                <span class="muted">No categories yet</span>
+              {% endif %}
             </div>
-            <div class="divider" style="height:1px;background:var(--border);margin:10px 0;"></div>
-            <a class="btn-google g-auth" href="{% provider_login_url 'google' %}">
-              <!-- оригинальная «G» -->
-              <svg class="google-g" viewBox="0 0 533.5 544" aria-hidden="true" width="20" height="20">
-                <path fill="#4285F4" d="M533.5 278.4c0-18.6-1.7-37-5.1-54.8H272v103.8h147.3c-6.4 34.6-26 64-55.4 83.6v69.3h89.6c52.4-48.3 79-119.5 79-201.9z"/>
-                <path fill="#34A853" d="M272 544c73.5 0 135.3-24.3 180.4-66.8l-89.6-69.3c-24.9 16.7-56.8 26.5-90.8 26.5-69.7 0-128.8-47-150-110.1H30.8v69.9C75.5 486 168.5 544 272 544z"/>
-                <path fill="#FBBC05" d="M122 324.3c-10.3-30.6-10.3-63.9 0-94.5V160H30.8c-41.4 82.5-41.4 181.5 0 264L122 324.3z"/>
-                <path fill="#EA4335" d="M272 106.5c40 0 76 13.8 104.3 40.9l78.2-78.2C407.1 24.5 345.4 0 272 0 168.5 0 75.5 58 30.8 160l91.2 69.9C143.2 153.8 202.3 106.5 272 106.5z"/>
-              </svg>
-              <span>Sign in with Google</span>
-            </a>
+
+            <div class="cats-actions">
+              <a class="btn-link" href="{% url 'categories:index' %}">All categories</a>
+              {% if request.user.is_staff %}
+                <a class="btn-link" href="{% url 'categories:create' %}">+ New category</a>
+              {% endif %}
+            </div>
           </div>
-        </div>
-      {% endif %}
-    </nav>
-  </div>
+        </li>
+
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+
+        {% if request.user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'articles:create' %}">Write</a></li>
+        {% endif %}
+
+        <!-- right side: avatar for auth / login dropdown for guests -->
+        {% if request.user.is_authenticated %}
+          <li class="nav-item nav-avatar" id="navAvatar">
+            <div class="avatar-trigger">
+              <button class="avatar-btn" id="avatarBtn" type="button"
+                      aria-haspopup="true" aria-expanded="false" aria-controls="avatarPanel"
+                      title="{{ request.user.get_full_name|default:request.user.username }}">
+                {% if request.user.avatar %}
+                  <img src="{{ request.user.avatar.url }}" alt="{{ request.user.username }}">
+                {% else %}
+                  <img src="{% static 'img/avatar-default.png' %}" alt="{{ request.user.username }}">
+                {% endif %}
+              </button>
+              <span class="avatar-caption"
+                    title="{{ request.user.get_full_name|default:request.user.username }}">
+                {{ request.user.get_full_name|default:request.user.username|truncatechars:18 }}
+              </span>
+            </div>
+
+            <div class="nav-dropdown avatar-panel" id="avatarPanel" hidden>
+              <div class="menu-list">
+                <a class="menu-item" href="{% url 'articles:create' %}">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16l10-10 2 2-10 10H6v-2z"/></svg>
+                  Write
+                </a>
+                <a class="menu-item" href="{% url 'articles:index' %}?author=me">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v4H6zM6 10h12v10H6z"/></svg>
+                  My articles
+                </a>
+                <a class="menu-item" href="{% url 'account_change_password' %}">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-5V9a6 6 0 1 0-12 0v3H4v10h16V12h-2z"/></svg>
+                  Change password
+                </a>
+                <form class="menu-item logout" action="{% url 'account_logout' %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5v3H3v4h7v3zm9-12h-6V3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6v-2h6V5z"/></svg>
+                    Logout
+                  </button>
+                </form>
+              </div>
+            </div>
+          </li>
+        {% else %}
+          <li class="nav-item nav-login" id="navLogin">
+            <button class="nav-link" id="loginBtn" type="button"
+                    aria-haspopup="true" aria-expanded="false" aria-controls="loginPanel">
+              Login
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown login-panel" id="loginPanel" hidden>
+              <div class="row">
+                <a class="btn-link" href="{% url 'account_login' %}">Login</a>
+                <a class="btn-link" href="{% url 'account_signup' %}">Register</a>
+              </div>
+              <div class="divider" style="height:1px;background:var(--border);margin:10px 0;"></div>
+              <a class="btn-google g-auth" href="{% provider_login_url 'google' %}">
+                <svg class="google-g" viewBox="0 0 533.5 544" aria-hidden="true" width="20" height="20">
+                  <path fill="#4285F4" d="M533.5 278.4c0-18.6-1.7-37-5.1-54.8H272v103.8h147.3c-6.4 34.6-26 64-55.4 83.6v69.3h89.6c52.4-48.3 79-119.5 79-201.9z"/>
+                  <path fill="#34A853" d="M272 544c73.5 0 135.3-24.3 180.4-66.8l-89.6-69.3c-24.9 16.7-56.8 26.5-90.8 26.5-69.7 0-128.8-47-150-110.1H30.8v69.9C75.5 486 168.5 544 272 544z"/>
+                  <path fill="#FBBC05" d="M122 324.3c-10.3-30.6-10.3-63.9 0-94.5V160H30.8c-41.4 82.5-41.4 181.5 0 264L122 324.3z"/>
+                  <path fill="#EA4335" d="M272 106.5c40 0 76 13.8 104.3 40.9l78.2-78.2C407.1 24.5 345.4 0 272 0 168.5 0 75.5 58 30.8 160l91.2 69.9C143.2 153.8 202.3 106.5 272 106.5z"/>
+                </svg>
+                <span>Sign in with Google</span>
+              </a>
+            </div>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
 </header>
 
 <main>
@@ -191,23 +202,62 @@
 </footer>
 
 <script>
-/* Back */
+/* Floating Back button: move to <body> and show when history is available */
 (function () {
   const btn = document.getElementById('navBack');
   if (!btn) return;
-  const show = window.history.length > 1 || !!document.referrer;
-  if (show) btn.hidden = false;
+  document.body.appendChild(btn);
+  const hasHistory = window.history.length > 1 || !!document.referrer;
+  if (hasHistory) btn.hidden = false;
   btn.addEventListener('click', () => {
     if (window.history.length > 1) { window.history.back(); return; }
     window.location.href = btn.dataset.fallback || '/';
   });
 })();
+</script>
 
-/* Categories hover (нижняя панель по наведению) */
+<script>
+/* Burger menu toggle (≤640px) */
+(function(){
+  const header = document.querySelector('.site-header');
+  const toggle = document.getElementById('navToggle');
+  const nav = document.getElementById('primaryNav');
+  if(!header || !toggle || !nav) return;
+
+  function closeMenu(){
+    header.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded','false');
+  }
+  toggle.addEventListener('click', function(){
+    const open = header.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  // close on outside click
+  document.addEventListener('click', (e)=>{
+    if(!header.contains(e.target)) closeMenu();
+  });
+  // close when going back to desktop
+  const mq = window.matchMedia('(min-width: 641px)');
+  mq.addEventListener?.('change', e => { if(e.matches) closeMenu(); });
+})();
+</script>
+
+<script>
+/* Categories hover panel: enable only on larger screens + pointer devices */
 (function () {
   const trigger = document.getElementById('categoriesBtn');
   const sourcePanel = document.getElementById('categoriesPanel');
   if (!trigger || !sourcePanel) return;
+
+  const canHover = window.matchMedia('(hover: hover) and (min-width: 761px)').matches;
+
+  if (!canHover) {
+    // On touch/mobile just navigate to categories index when clicked
+    trigger.addEventListener('click', () => {
+      window.location.href = "{% url 'categories:index' %}";
+    });
+    return;
+  }
 
   let hoverPanel = document.getElementById('catsHoverPanel');
   if (!hoverPanel) {
@@ -240,7 +290,9 @@
   window.addEventListener('resize', ()=>{ if (hoverPanel.classList.contains('open')) place(); });
   window.addEventListener('scroll', ()=>{ if (hoverPanel.classList.contains('open')) place(); }, {passive:true});
 })();
+</script>
 
+<script>
 /* Login dropdown (guest) */
 (function () {
   const item = document.getElementById('navLogin');
@@ -257,7 +309,9 @@
   document.addEventListener('click', (e)=>{ if (!item.contains(e.target)) close(0); });
   document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') close(0); });
 })();
+</script>
 
+<script>
 /* Avatar dropdown (auth) */
 (function () {
   const item = document.getElementById('navAvatar');
@@ -273,28 +327,6 @@
   trigger.addEventListener('click', (e)=>{ e.preventDefault(); panel.hidden ? open() : close(0); });
   document.addEventListener('click', (e)=>{ if (!item.contains(e.target)) close(0); });
   document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') close(0); });
-})();
-</script>
-
-<script>
-/* Кнопка Назад: показываем и переносим в <body>, чтобы висела снизу */
-(function () {
-  const btn = document.getElementById('navBack');
-  if (!btn) return;
-
-  // перенесём из шапки в body, чтобы шапка не влияла на позиционирование
-  document.body.appendChild(btn);
-
-  // хочешь справа — раскомментируй строку ниже
-  // btn.classList.add('back--right');
-
-  const hasHistory = window.history.length > 1 || !!document.referrer;
-  if (hasHistory) btn.hidden = false;
-
-  btn.addEventListener('click', () => {
-    if (window.history.length > 1) { window.history.back(); return; }
-    window.location.href = btn.dataset.fallback || '/';
-  });
 })();
 </script>
 

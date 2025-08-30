@@ -12,4 +12,3 @@ urlpatterns = [
     path("<int:pk>/edit/", ArticleUpdateView.as_view(), name="edit"),
     path("<int:pk>/delete/", ArticleDeleteView.as_view(), name="delete"),
 ]
-

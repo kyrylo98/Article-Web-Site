@@ -20,3 +20,4 @@ urlpatterns = [
         template_name="pages/sitemap.html"), name="sitemap"),
 ]
 
+

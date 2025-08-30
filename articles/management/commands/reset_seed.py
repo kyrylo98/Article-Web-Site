@@ -15,8 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from articles.models import Article
 from category.models import Category
-
-# 25 ровно (включая News, Cars, Plants, Astrology и др.)
+# comment removed (non-English)
 CATEGORIES = [
     "News", "Politics", "World", "Business", "Finance",
     "Technology", "Programming", "Python", "Django", "Frontend",
@@ -66,14 +65,14 @@ def _font(size=64):
     return ImageFont.load_default()
 
 def _measure(draw: ImageDraw.ImageDraw, text: str, font) -> tuple[int, int]:
-    # Pillow 10+: textbbox вместо textsize
+# comment removed (non-English)
     if hasattr(draw, "textbbox"):
         l, t, r, b = draw.textbbox((0, 0), text, font=font)
         return r - l, b - t
     return draw.textsize(text, font=font)  # fallback
 
 def _make_image(text: str, w=1200, h=630) -> ContentFile:
-    # Градиентный фон + мягкая виньетка + центрированный текст
+# comment removed (non-English)
     (c1, c2), ink = random.choice(PALETTES)
 
     def hex2rgb(hex_color: str):
@@ -85,29 +84,25 @@ def _make_image(text: str, w=1200, h=630) -> ContentFile:
 
     img = Image.new("RGB", (w, h), start)
     draw = ImageDraw.Draw(img)
-
-    # Вертикальный градиент
+# comment removed (non-English)
     for y in range(h):
         t = y / h
         col = tuple(int(start[i] * (1 - t) + end[i] * t) for i in range(3))
         draw.line([(0, y), (w, y)], fill=col)
-
-    # Лёгкая виньетка
+# comment removed (non-English)
     overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     odraw = ImageDraw.Draw(overlay)
     odraw.rectangle([0, 0, w, h], fill=(0, 0, 0, 40))
     img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
-
-    # Текст
+# comment removed (non-English)
     title = text[:28]
     font = _font(74)
     tw, th = _measure(draw, title, font)
     x, y = (w - tw) // 2, (h - th) // 2
-
-    # Тень
+# comment removed (non-English)
     for dx, dy in ((2, 2), (1, 1)):
         draw.text((x + dx, y + dy), title, font=font, fill=(0, 0, 0, 120))
-    # Основной
+# comment removed (non-English)
     draw.text((x, y), title, font=font, fill=ink)
 
     buf = io.BytesIO()
@@ -166,4 +161,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f"Done! Categories: {Category.objects.count()}, Articles: {Article.objects.count()}"
         ))
+
 

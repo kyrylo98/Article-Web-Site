@@ -16,4 +16,3 @@ urlpatterns = [
     path("<int:pk>/edit/", CategoryUpdateView.as_view(), name="edit"),
     path("<int:pk>/delete/", CategoryDeleteView.as_view(), name="delete"),
 ]
-

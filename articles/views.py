@@ -12,7 +12,6 @@ from .forms import ArticleForm
 from .models import Article
 
 
-# articles/views.py
 class HomeListView(ListView):
     model = Article
     template_name = "articles/list.html"
@@ -25,13 +24,13 @@ class HomeListView(ListView):
 
         author_param = (self.request.GET.get("author") or "").strip().lower()
         if author_param == "me" and user.is_authenticated:
-            qs = qs.filter(author_id=user.id)                       # свои (можно и неопубликованные)
+            qs = qs.filter(author_id=user.id)
         elif author_param.isdigit():
             author_id = int(author_param)
             if user.is_authenticated and author_id == user.id:
-                qs = qs.filter(author_id=user.id)                   # свои
+                qs = qs.filter(author_id=user.id)
             else:
-                qs = qs.filter(author_id=author_id, is_published=True)  # чужие только опубликованные
+                qs = qs.filter(author_id=author_id, is_published=True)
         else:
             qs = qs.filter(is_published=True)
 
@@ -118,4 +117,3 @@ class ArticleDeleteView(LoginRequiredMixin,
     model = Article
     template_name = "articles/confirm_delete.html"
     success_url = reverse_lazy("articles:index")
-

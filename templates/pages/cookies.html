@@ -1,11 +1,102 @@
 {% extends "base.html" %}
+
 {% block title %}Cookie Policy — Aurora{% endblock %}
+
+{% block meta %}
+  {{ block.super }}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+  <meta name="description"
+        content="Aurora uses essential cookies for login and security and optional analytics cookies to improve the product. Learn how to control cookies in your browser." />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Cookie Policy — Aurora" />
+  <meta property="og:description"
+        content="Learn what cookies we use and how to control them." />
+  <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Cookie Policy — Aurora" />
+  <meta name="twitter:description"
+        content="Learn what cookies we use and how to control them." />
+
+  <!-- Structured data: WebPage + Breadcrumbs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Cookie Policy",
+    "url": "{{ request.build_absolute_uri }}",
+    "dateModified": "{% now 'c' %}",
+    "isPartOf": { "@type": "WebSite", "name": "Aurora" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",
+        "item": "{{ request.scheme }}://{{ request.get_host }}/" },
+      { "@type": "ListItem", "position": 2, "name": "Cookie Policy",
+        "item": "{{ request.build_absolute_uri }}" }
+    ]
+  }
+  </script>
+{% endblock %}
+
 {% block content %}
 <section class="section container prose">
   <h1 class="page-title">Cookie Policy</h1>
+
+  <!-- In-page TOC for UX/SEO -->
+  <nav class="chips" aria-label="Sections">
+    <a class="chip" href="#what-are-cookies">What are cookies</a>
+    <a class="chip" href="#how-we-use">How we use cookies</a>
+    <a class="chip" href="#your-choices">Your choices</a>
+    <a class="chip" href="#changes">Changes</a>
+    <a class="chip" href="#contact">Contact</a>
+  </nav>
+
+  <h2 id="what-are-cookies">What are cookies</h2>
   <p>
-    We use essential cookies for authentication and optional analytics
-    cookies to improve UX. You can control cookies in your browser.
+    Cookies are small text files stored on your device by the websites you visit.
+    They help a site work properly, stay secure, remember preferences and measure usage.
   </p>
+
+  <h2 id="how-we-use">How we use cookies</h2>
+  <ul>
+    <li><strong>Essential (required)</strong> — authentication, session management, CSRF protection.</li>
+    <li><strong>Preferences</strong> — UI settings such as theme or language.</li>
+    <li><strong>Analytics (optional)</strong> — aggregated metrics to improve performance and content.</li>
+  </ul>
+  <p class="muted">
+    We do not use cookies to sell personal information. Analytics, if enabled, are aggregated and anonymized where possible.
+  </p>
+
+  <h3>Retention</h3>
+  <p>
+    Session cookies expire when you close the browser; persistent cookies last from 1 day to 12 months unless deleted earlier.
+  </p>
+
+  <h2 id="your-choices">Your choices</h2>
+  <ul>
+    <li>Use your browser controls to block or delete cookies (see Help for Chrome, Firefox, Edge, Safari).</li>
+    <li>If you block essential cookies, some features (login, posting) may not work.</li>
+    <li>You can opt out of analytics cookies in your browser or by using built-in tracking protection.</li>
+  </ul>
+
+  <h2 id="changes">Changes to this policy</h2>
+  <p>
+    We may update this Cookie Policy from time to time. The “Last updated” date reflects the latest version.
+  </p>
+
+  <h2 id="contact">Contact</h2>
+  <p>
+    Questions? Email <a href="mailto:support@example.com">support@example.com</a>.
+  </p>
+
+  <p class="muted">Last updated: {% now "F j, Y" %}</p>
 </section>
 {% endblock %}

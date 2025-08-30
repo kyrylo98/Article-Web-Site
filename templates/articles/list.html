@@ -4,7 +4,7 @@
 {% block content %}
 <section class="section container">
 
-  <!-- Заголовок + поиск + CTA -->
+
   <div class="hero-gradient" style="margin-bottom:var(--g-3)">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
       <h1 class="page-title m0">{% if is_my_articles %}My articles{% else %}Articles{% endif %}</h1>
@@ -13,7 +13,6 @@
       {% endif %}
     </div>
 
-    <!-- Поиск (GET + сохранение активных фильтров) -->
     <form class="articles-search" method="get" action="{% url 'articles:index' %}">
       <input type="search"
              name="q"
@@ -29,7 +28,6 @@
     </form>
   </div>
 
-  <!-- Фильтры категорий -->
   <div class="chips">
     <a class="chip {% if not active_category %}active{% endif %}"
        href="{% url 'articles:index' %}{% if is_my_articles %}?author=me{% endif %}">All</a>
@@ -44,14 +42,13 @@
     {% endfor %}
   </div>
 
-  <!-- Компактная лента -->
   {% if page_obj.object_list %}
     <div class="feed feed--compact">
 
       {% for item in page_obj %}
         <article class="card card--post">
 
-          <!-- Верхняя строка -->
+
           <div class="meta-top">
             <span class="badge meta-type">Article</span>
             <div class="meta-author">
@@ -64,12 +61,11 @@
             </div>
           </div>
 
-          <!-- Заголовок -->
           <h2 class="post-title">
             <a href="{% url 'articles:detail' item.pk %}">{{ item.title }}</a>
           </h2>
 
-          <!-- Метаданные -->
+
           <div class="meta-row">
             {% if item.category %}
               <a class="chip cat-pill"
@@ -89,14 +85,13 @@
             </span>
           </div>
 
-          <!-- Картинка -->
+
           {% if item.image %}
             <a href="{% url 'articles:detail' item.pk %}">
               <img class="post-thumb" src="{{ item.image.url }}" alt="">
             </a>
           {% endif %}
 
-          <!-- Превью -->
           <p class="post-preview">
             {% if item.description %}
               {{ item.description }}
@@ -105,7 +100,7 @@
             {% endif %}
           </p>
 
-          <!-- Действия -->
+
           <div class="post-actions">
             <a class="cta secondary" href="{% url 'articles:detail' item.pk %}">Read more</a>
             <div class="counters">
@@ -114,7 +109,6 @@
             </div>
           </div>
 
-          <!-- Редактирование для автора/админа -->
           {% if request.user.is_authenticated %}
             {% if request.user.is_staff or request.user.pk == item.author_id %}
               <div class="owner-actions">

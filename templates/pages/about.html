@@ -1,12 +1,114 @@
 {% extends "base.html" %}
-{% block title %}About us — Aurora{% endblock %}
+{% load static %}
+
+{% block title %}About — Aurora{% endblock %}
+
+{% block meta %}
+  {{ block.super }}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+  <meta name="description"
+        content="Aurora is a compact publishing platform for clear, actionable articles on software, web development and product craft." />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="About — Aurora" />
+  <meta property="og:description"
+        content="Who we are, what we publish, and how we write concise, trustworthy guides for developers and makers." />
+  <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+  <meta property="og:image" content="{% static 'img/hero1.jpg' %}" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About — Aurora" />
+  <meta name="twitter:description"
+        content="Who we are, what we publish, and how we write concise, trustworthy guides for developers and makers." />
+  <meta name="twitter:image" content="{% static 'img/hero1.jpg' %}" />
+
+  <!-- Structured data: AboutPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About — Aurora",
+    "url": "{{ request.build_absolute_uri }}",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Aurora",
+      "url": "{{ request.scheme }}://{{ request.get_host }}/"
+    },
+    "primaryImageOfPage": "{% static 'img/hero1.jpg' %}",
+    "description": "Aurora is a compact publishing platform for clear, actionable articles on software, web development and product craft."
+  }
+  </script>
+{% endblock %}
+
 {% block content %}
-<section class="section container prose">
-  <h1 class="page-title">About us</h1>
-  <p>
-    Aurora is a tiny publishing platform for short, readable articles
-    about software, web development and product craft. We focus on
-    clarity, speed and accessibility.
-  </p>
+<section class="section container">
+
+  <!-- Hero: responsive image + overlay + copy -->
+  <div class="card--glass hero-gradient"
+       style="position:relative;overflow:hidden;min-height:240px;border-radius:18px">
+    <img
+      src="{% static 'img/hero.jpg' %}"
+      alt="Aurora — short and readable developer content"
+      width="1600" height="900" loading="eager" fetchpriority="high"
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+    <div aria-hidden="true"
+         style="position:absolute;inset:0;background:linear-gradient(90deg, rgba(11,16,32,.92), rgba(11,16,32,.58));"></div>
+
+    <div style="position:relative;max-width:760px;padding:24px 18px 28px">
+      <h1 class="page-title m0" style="color:#fff">About us</h1>
+      <p class="muted" style="max-width:70ch;color:#e6edf3">
+        Aurora is a tiny publishing platform for short, readable articles
+        about software, web development and product craft. We focus on
+        clarity, speed and accessibility.
+      </p>
+    </div>
+  </div>
+
+  <!-- What we do / How we write / Contact; collapses to single column on small screens -->
+  <div class="card-grid" style="--min:260px;margin-top:var(--g-3)">
+    <article class="card">
+      <h2 class="m0">What we publish</h2>
+      <ul>
+        <li>Backend: Python &amp; Django patterns, APIs, testing, deploy.</li>
+        <li>Frontend: semantic HTML, accessible components, performance.</li>
+        <li>Product &amp; UX: research shortcuts, onboarding, release notes.</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2 class="m0">How we write</h2>
+      <ul>
+        <li>Concise, practical, step-by-step guides.</li>
+        <li>Real code snippets and checklists you can apply fast.</li>
+        <li>Plain language, small paragraphs, scannable structure.</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2 class="m0">Get in touch</h2>
+      <p class="m0">
+        Want to propose a topic or contribute a draft?
+        <a href="{% url 'pages:contact' %}">Contact us</a> — we welcome
+        concise, useful pieces that help readers ship faster.
+      </p>
+    </article>
+  </div>
+
+  <!-- Extra copy for SEO; remains readable on 320px -->
+  <article class="card prose" style="margin-top:var(--g-3);padding:var(--g-3)">
+    <h2 class="m0">Our principles</h2>
+    <p>
+      We optimize for reader time. Each article aims to answer a focused question,
+      provide a minimal working example, and link to deeper resources.
+      If a tutorial exceeds 7–10 minutes, we split it into parts.
+    </p>
+    <h3 class="m0">Why readers trust Aurora</h3>
+    <ul>
+      <li>Editorial review for accuracy and clarity.</li>
+      <li>Consistent structure, clear headings and internal linking.</li>
+      <li>Fast pages: lightweight CSS, compressed media, accessible markup.</li>
+    </ul>
+  </article>
+
 </section>
 {% endblock %}

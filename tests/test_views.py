@@ -24,8 +24,7 @@ class ArticleViewTests(TestCase):
 
         cls.category_backend = Category.objects.create(name="Backend")
         cls.category_frontend = Category.objects.create(name="Frontend")
-
-        # опубликованные статьи
+# comment removed (non-English)
         for index in range(7):
             Article.objects.create(
                 title=f"Post {index}",
@@ -40,8 +39,7 @@ class ArticleViewTests(TestCase):
                     else cls.category_frontend
                 ),
             )
-
-        # черновик (не должен попадать в список)
+# comment removed (non-English)
         Article.objects.create(
             title="Draft",
             description="Hidden",
@@ -164,4 +162,5 @@ class ArticleViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Article.objects.filter(pk=article.pk).exists())
+
 

@@ -8,16 +8,13 @@ from Article_Web_Site.views import home_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    # Главная (лендинг/индекс)
+# comment removed (non-English)
     path("", home_view, name="home"),
-
-    # Статьи и пользователи
+# comment removed (non-English)
     path("articles/", include(("articles.urls", "articles"),
                               namespace="articles")),
     path("users/", include(("users.urls", "users"), namespace="users")),
-
-    # Аутентификация (шаблоны из папки templates/registration/)
+# comment removed (non-English)
     path("login/",
          auth_views.LoginView.as_view(
              template_name="registration/login.html"
@@ -26,8 +23,7 @@ urlpatterns = [
     path("logout/",
          auth_views.LogoutView.as_view(),
          name="logout"),
-
-    # Смена пароля (готовые представления Django)
+# comment removed (non-English)
     path("password-change/",
          auth_views.PasswordChangeView.as_view(
              template_name="registration/password_change_form.html"
@@ -49,5 +45,6 @@ if settings.DEBUG:
                           document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_ROOT)
+
 
 

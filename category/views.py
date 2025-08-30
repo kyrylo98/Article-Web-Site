@@ -8,23 +8,20 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
-    DetailView,
     ListView,
     UpdateView,
 )
 
 from .models import Category
-from articles.models import Article
+
 
 
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Доступ только для staff-пользователей."""
     def test_func(self) -> bool:
         return bool(self.request.user and self.request.user.is_staff)
 
 
 class CategoryListView(ListView):
-    """Список категорий с поиском и счётчиком статей."""
     model = Category
     template_name = "categories/list.html"
     context_object_name = "categories"
@@ -46,9 +43,6 @@ class CategoryListView(ListView):
 
 
 class CategoryArticlesView(ListView):
-    """
-    Список статей в категории (вместо DetailView, чтобы было удобно пагинировать).
-    """
     template_name = "categories/detail.html"
     context_object_name = "articles"
     paginate_by = 12
@@ -79,8 +73,7 @@ class CategoryCreateView(StaffRequiredMixin, CreateView):
     fields = ["name", "description"]
     template_name = "categories/form.html"
     success_url = reverse_lazy("categories:index")
-
-    # чтобы шаблон мог обращаться к переменной "category"
+# comment removed (non-English)
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context.setdefault("category", None)
@@ -103,7 +96,7 @@ class CategoryDeleteView(StaffRequiredMixin, DeleteView):
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from articles.models import Article  # поправь импорт под свой путь
+from articles.models import Article
 
 @login_required
 def account_view(request):

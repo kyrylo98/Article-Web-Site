@@ -41,3 +41,4 @@ class ArticleModelTests(TestCase):
         )
         self.assertEqual(article.reading_minutes, 3)
 
+

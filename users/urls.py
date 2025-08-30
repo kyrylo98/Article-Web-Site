@@ -8,3 +8,4 @@ urlpatterns = [
     path("account/", account_view, name="account"),
 ]
 
+

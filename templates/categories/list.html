@@ -7,7 +7,6 @@
   <div class="container">
     <h1 class="page-title">Categories</h1>
 
-    <!-- Toolbar: поиск + создание -->
     <form class="cat-search" method="get" action="">
       <input type="search" name="q" placeholder="Search categories…"
              value="{{ request.GET.q|default_if_none:'' }}">
@@ -17,7 +16,6 @@
       {% endif %}
     </form>
 
-    <!-- Сетка категорий -->
     <div class="cats-grid">
       {% for cat in categories|default:object_list %}
         <a class="cat-tile" href="{% url 'articles:index' %}?category={{ cat.pk }}">

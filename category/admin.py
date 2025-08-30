@@ -8,3 +8,4 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     ordering = ("name",)
 
+
