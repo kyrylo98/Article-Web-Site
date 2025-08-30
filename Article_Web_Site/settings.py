@@ -1,4 +1,4 @@
-from pathlib import Path
+from pathlib import Path`r`nimport os
 import os
 
 from dotenv import load_dotenv
@@ -7,9 +7,9 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-secret-change-me"
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".ngrok-free.app",]
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-unsafe-secret-change-me")
+DEBUG = os.environ.get("DEBUG", "1") in ("1","true","True")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -135,5 +135,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
+
+
 
 
