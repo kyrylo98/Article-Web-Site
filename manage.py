@@ -19,3 +19,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# housekeeping: normalize end-of-file newline
